@@ -1,15 +1,11 @@
 import React, { memo } from "react";
 import PropTypes from "prop-types";
 import { Switch } from "react-router-dom";
+import Home from "../components/home/Home"
 import PropsRoute from "../../shared/components/PropsRoute";
-import Home from "./home/Home";
-// import Blog from "./blog/Blog";
-// import BlogPost from "./blog/BlogPost";
-// import useLocationBlocker from "../../shared/functions/useLocationBlocker";
 
 function Routing(props) {
   const { selectHome } = props;
-//   useLocationBlocker();
   return (
     <Switch>
       <PropsRoute path="/" component={Home} selectHome={selectHome} />

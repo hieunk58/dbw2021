@@ -22,7 +22,6 @@ import {
 } from "@material-ui/core";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import ImageIcon from "@material-ui/icons/Image";
-import AccountBalanceIcon from "@material-ui/icons/AccountBalance";
 import PowerSettingsNewIcon from "@material-ui/icons/PowerSettingsNew";
 import MenuIcon from "@material-ui/icons/Menu";
 import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
@@ -32,35 +31,43 @@ import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
 import NavigationDrawer from "../../../shared/components/NavigationDrawer";
 
 const styles = (theme) => ({
+  // appBar: {
+  //   boxShadow: theme.shadows[6],
+  //   backgroundColor: theme.palette.common.white,
+  //   transition: theme.transitions.create(["width", "margin"], {
+  //     easing: theme.transitions.easing.sharp,
+  //     duration: theme.transitions.duration.leavingScreen,
+  //   }),
+  //   [theme.breakpoints.down("xs")]: {
+  //     width: "100%",
+  //     marginLeft: 0,
+  //   },
+  // },
+  // appBarToolbar: {
+  //   display: "flex",
+  //   justifyContent: "space-between",
+  //   paddingLeft: theme.spacing(1),
+  //   paddingRight: theme.spacing(1),
+  //   [theme.breakpoints.up("sm")]: {
+  //     paddingLeft: theme.spacing(2),
+  //     paddingRight: theme.spacing(2),
+  //   },
+  //   [theme.breakpoints.up("md")]: {
+  //     paddingLeft: theme.spacing(3),
+  //     paddingRight: theme.spacing(3),
+  //   },
+  //   [theme.breakpoints.up("lg")]: {
+  //     paddingLeft: theme.spacing(4),
+  //     paddingRight: theme.spacing(4),
+  //   },
+  // },
   appBar: {
     boxShadow: theme.shadows[6],
-    backgroundColor: theme.palette.common.white,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    [theme.breakpoints.down("xs")]: {
-      width: "100%",
-      marginLeft: 0,
-    },
+    backgroundColor: theme.palette.common.black
   },
   appBarToolbar: {
     display: "flex",
-    justifyContent: "space-between",
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1),
-    [theme.breakpoints.up("sm")]: {
-      paddingLeft: theme.spacing(2),
-      paddingRight: theme.spacing(2),
-    },
-    [theme.breakpoints.up("md")]: {
-      paddingLeft: theme.spacing(3),
-      paddingRight: theme.spacing(3),
-    },
-    [theme.breakpoints.up("lg")]: {
-      paddingLeft: theme.spacing(4),
-      paddingRight: theme.spacing(4),
-    },
+    justifyContent: "space-between"
   },
   accountAvatar: {
     backgroundColor: theme.palette.secondary.main,
@@ -106,6 +113,9 @@ const styles = (theme) => ({
   textPrimary: {
     color: theme.palette.primary.main,
   },
+  textSelected: {
+    color: theme.palette.common.pink,
+  },
   mobileItemSelected: {
     backgroundColor: `${theme.palette.primary.main} !important`,
   },
@@ -128,7 +138,7 @@ const styles = (theme) => ({
 });
 
 function NavBar(props) {
-  const { selectedTab, messages, classes, width, openAddBalanceDialog } = props;
+  const { selectedTab, messages, classes, width } = props;
   // Will be use to make website more accessible by screen readers
   const links = useRef([]);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -150,6 +160,7 @@ function NavBar(props) {
 //     setIsSideDrawerOpen(false);
 //   }, [setIsSideDrawerOpen]);
 
+  // Menu items on left navigation bar: Dashboard, Logout, etc
   const menuItems = [
     {
       link: "/c/dashboard",
@@ -159,7 +170,7 @@ function NavBar(props) {
         desktop: (
           <DashboardIcon
             className={
-              selectedTab === "Dashboard" ? classes.textPrimary : "text-white"
+              selectedTab === "Dashboard" ? classes.textSelected : "text-white"
             }
             fontSize="small"
           />
@@ -233,58 +244,16 @@ function NavBar(props) {
                 variant="h4"
                 className={classes.brandText}
                 display="inline"
-                color="primary"
+                color="secondary"
               >
                 TU Chemnitz
               </Typography>
             </Hidden>
           </Box>
-          <Box
-            display="flex"
-            justifyContent="flex-end"
-            alignItems="center"
-            width="100%"
-          >
-            {/* {isWidthUp("sm", width) && (
-              <Box mr={3}>
-                <Balance
-                  balance={2573}
-                  openAddBalanceDialog={openAddBalanceDialog}
-                />
-              </Box>
-            )}
-            <MessagePopperButton messages={messages} /> */}
-            <ListItem
-              disableGutters
-              className={classNames(classes.iconListItem, classes.smBordered)}
-            >
-              <Avatar
-                alt="profile picture"
-                src={`${process.env.PUBLIC_URL}/images/logged_in/profilePicture.jpg`}
-                className={classNames(classes.accountAvatar)}
-              />
-              {isWidthUp("sm", width) && (
-                <ListItemText
-                  className={classes.username}
-                  primary={
-                    <Typography color="textPrimary">Username</Typography>
-                  }
-                />
-              )}
-            </ListItem>
-          </Box>
-          {/* <IconButton
-            onClick={openDrawer}
-            color="primary"
-            aria-label="Open Sidedrawer"
-          >
-            <SupervisorAccountIcon />
-          </IconButton> */}
-          {/* <SideDrawer open={isSideDrawerOpen} onClose={closeDrawer} /> */}
         </Toolbar>
       </AppBar>
       <Hidden xsDown>
-        <Drawer //  both drawers can be combined into one for performance
+        <Drawer //  Drawer on the left side
           variant="permanent"
           classes={{
             paper: classes.drawerPaper,
@@ -331,7 +300,7 @@ function NavBar(props) {
           </List>
         </Drawer>
       </Hidden>
-      <NavigationDrawer
+      {/* <NavigationDrawer
         menuItems={menuItems.map((element) => ({
           link: element.link,
           name: element.name,
@@ -342,17 +311,16 @@ function NavBar(props) {
         open={isMobileOpen}
         selectedItem={selectedTab}
         onClose={closeMobileDrawer}
-      />
+      /> */}
     </Fragment>
   );
 }
 
 NavBar.propTypes = {
-  messages: PropTypes.arrayOf(PropTypes.object).isRequired,
+  // messages: PropTypes.arrayOf(PropTypes.object).isRequired,
   selectedTab: PropTypes.string.isRequired,
   width: PropTypes.string.isRequired,
   classes: PropTypes.object.isRequired,
-//   openAddBalanceDialog: PropTypes.func.isRequired,
 };
 
 export default withWidth()(withStyles(styles, { withTheme: true })(NavBar));

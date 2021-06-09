@@ -166,10 +166,10 @@ function SignInSide(props) {
               type="submit"
               fullWidth
               variant="contained"
-              color="primary"
+              color="secondary"
               disabled={isLoading}
               className={classes.submit}
-              onClick = { () => login }
+              // onClick = { () => login }
             >
               Sign In
               {isLoading}
@@ -186,9 +186,9 @@ function SignInSide(props) {
                 </Link>
               </Grid>
             </Grid> */}
-            <Box mt={5}>
+            {/* <Box mt={5}>
               <Copyright />
-            </Box>
+            </Box> */}
           </form>
         </div>
       </Grid>
