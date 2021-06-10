@@ -3,10 +3,9 @@ import PropTypes from "prop-types";
 import { Switch } from "react-router-dom";
 import { withStyles } from "@material-ui/core";
 import Dashboard from "./dashboard/Dashboard";
-// import Posts from "./posts/Posts";
-// import Subscription from "./subscription/Subscription";
+import Classes from "./classes/Classes";
+import Subjects from "./subjects/Subjects";
 import PropsRoute from "../../shared/components/PropsRoute";
-// import useLocationBlocker from "../../shared/functions/useLocationBlocker";
 
 const styles = (theme) => ({
   wrapper: {
@@ -46,60 +45,48 @@ const styles = (theme) => ({
 function Routing(props) {
   const {
     classes,
-    EmojiTextArea,
-    ImageCropper,
-    Dropzone,
-    DateTimePicker,
     pushMessageToSnackbar,
-    posts,
-    transactions,
-    toggleAccountActivation,
-    // CardChart,
-    statistics,
     targets,
     setTargets,
-    setPosts,
-    isAccountActivated,
+    subjectList,
+    setSubjectList,
+    classList,
+    setClassList,
     selectDashboard,
-    selectPosts,
-    selectSubscription,
-    openAddBalanceDialog,
+    selectClass,
+    selectSubject,
+    teacherList,
+    setTeacherList
+    // openAddBalanceDialog,
   } = props;
-//   useLocationBlocker();
+
   return (
     <div className={classes.wrapper}>
       <Switch>
         <PropsRoute
-          path="/c/posts"
-        //   component={Posts}
-          EmojiTextArea={EmojiTextArea}
-          ImageCropper={ImageCropper}
-          Dropzone={Dropzone}
-          DateTimePicker={DateTimePicker}
+          path="/c/classes"
+          component={Classes}
           pushMessageToSnackbar={pushMessageToSnackbar}
-          posts={posts}
-          setPosts={setPosts}
-          selectPosts={selectPosts}
+          selectClass={selectClass}
+          classList={classList}
+          setClassList={setClassList}
         />
         <PropsRoute
-          path="/c/subscription"
-        //   component={Subscription}
-        //   component={}
-          transactions={transactions}
+          path="/c/subjects"
+          component={Subjects}
           pushMessageToSnackbar={pushMessageToSnackbar}
-          selectSubscription={selectSubscription}
-          openAddBalanceDialog={openAddBalanceDialog}
+          selectSubject={selectSubject}
+          subjectList={subjectList}
+          setSubjectList={setSubjectList}
+          teacherList={teacherList}
+          setTeacherList={setTeacherList}
         />
         <PropsRoute
           path=""
           component={Dashboard}
-          toggleAccountActivation={toggleAccountActivation}
           pushMessageToSnackbar={pushMessageToSnackbar}
-        //   CardChart={CardChart}
-          statistics={statistics}
           targets={targets}
           setTargets={setTargets}
-          isAccountActivated={isAccountActivated}
           selectDashboard={selectDashboard}
         />
       </Switch>
@@ -109,24 +96,20 @@ function Routing(props) {
 
 Routing.propTypes = {
   classes: PropTypes.object.isRequired,
-  EmojiTextArea: PropTypes.elementType,
-  ImageCropper: PropTypes.elementType,
-  Dropzone: PropTypes.elementType,
-  DateTimePicker: PropTypes.elementType,
   pushMessageToSnackbar: PropTypes.func,
   setTargets: PropTypes.func.isRequired,
-  setPosts: PropTypes.func.isRequired,
-  posts: PropTypes.arrayOf(PropTypes.object).isRequired,
-  transactions: PropTypes.arrayOf(PropTypes.object).isRequired,
-  toggleAccountActivation: PropTypes.func,
-  CardChart: PropTypes.elementType,
-  statistics: PropTypes.object.isRequired,
+  subjectList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  teacherList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  setTeacherList: PropTypes.func.isRequired,
+  setSubjectList: PropTypes.func.isRequired,
+  classList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  setClassList: PropTypes.func.isRequired,
   targets: PropTypes.arrayOf(PropTypes.object).isRequired,
-  isAccountActivated: PropTypes.bool.isRequired,
   selectDashboard: PropTypes.func.isRequired,
-  selectPosts: PropTypes.func.isRequired,
-  selectSubscription: PropTypes.func.isRequired,
-  openAddBalanceDialog: PropTypes.func.isRequired,
+  selectClass: PropTypes.func.isRequired,
+  selectSubject: PropTypes.func.isRequired,
+  
+  // openAddBalanceDialog: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles, { withTheme: true })(memo(Routing));

@@ -24,7 +24,7 @@ import stableSort from "../../../shared/functions/stableSort";
 import getSorting from "../../../shared/functions/getSorting";
 import HighlightedInformation from "../../../shared/components/HighlightedInformation";
 import ConfirmationDialog from "../../../shared/components/ConfirmationDialog";
-import AddUserDialog from "./AddUserDialog";
+import AddSubjectDialog from "./AddSubjectDialog";
 
 const styles = (theme) => ({
   tableWrapper: {
@@ -64,35 +64,20 @@ const styles = (theme) => ({
 });
 
 const rows = [
-  {
-    id: "icon",
-    numeric: true,
-    label: "",
-  },
-  {
-    id: "name",
-    numeric: false,
-    label: "Name",
-  },
+  { id: "icon", numeric: true, label: "", },
+  { id: "name", numeric: false, label: "Name", },
   { id: "number1", numeric: false, label: "Category 1" },
   { id: "number2", numeric: false, label: "Category 2" },
   { id: "number3", numeric: false, label: "Category 3" },
-  {
-    id: "number4",
-    numeric: false,
-    label: "Category 4",
-  },
-  {
-    id: "actions",
-    numeric: false,
-    label: "",
-  },
+  { id: "number4", numeric: false, label: "Category 4", },
+  { id: "actions", numeric: false, label: "", },
 ];
 
 const rowsPerPage = 25;
 
 function CustomTable(props) {
-  const { pushMessageToSnackbar, classes, targets, setTargets, openAddUserDialog } = props;
+  const { pushMessageToSnackbar, classes, subjectList, setSubjectList, teacherList, setTeacherList, 
+      openAddUserDialog } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
@@ -130,23 +115,23 @@ function CustomTable(props) {
     setTimeout(() => {
       setIsDeleteTargetDialogOpen(false);
       setIsDeleteTargetLoading(false);
-      const _targets = [...targets];
-      const index = _targets.findIndex(
+      const _subjectList = [...subjectList];
+      const index = _subjectList.findIndex(
         (element) => element.id === deleteTargetDialogRow.id
       );
-      _targets.splice(index, 1);
-      setTargets(_targets);
+      _subjectList.splice(index, 1);
+      setSubjectList(_subjectList);
       pushMessageToSnackbar({
-        text: "Your friend has been removed",
+        text: "Subject has been removed",
       });
     }, 1500);
   }, [
     setIsDeleteTargetDialogOpen,
     setIsDeleteTargetLoading,
     pushMessageToSnackbar,
-    setTargets,
+    setSubjectList,
     deleteTargetDialogRow,
-    targets,
+    subjectList,
   ]);
 
   const handleChangePage = useCallback(
@@ -171,18 +156,23 @@ function CustomTable(props) {
   return (
     <Paper>
       <Toolbar className={classes.toolbar}>
-        <Typography variant="h6">User List</Typography>
+        <Typography variant="h6">Subject List</Typography>
         <Button
           variant="contained"
           color="secondary"
           onClick={handleClickOpen}
           disableElevation
         >
-          Add User
+          Add Subject
         </Button>
       </Toolbar>
-      <AddUserDialog open={open} onClose={handleClose}>
-      </AddUserDialog>
+      
+      <AddSubjectDialog 
+        open={open}
+        onClose={handleClose}
+        teacherList={teacherList}
+      >
+      </AddSubjectDialog>
       <Divider />
       <ConfirmationDialog
         open={isDeleteTargetDialogOpen}
@@ -191,7 +181,7 @@ function CustomTable(props) {
         content={
           deleteTargetDialogRow ? (
             <span>
-              {"Do you really want to remove this user "}
+              {"Do you really want to remove this subject "}
               <b>{deleteTargetDialogRow.name}</b>
               {" from your list?"}
             </span>
@@ -203,17 +193,17 @@ function CustomTable(props) {
       />
       <Box width="100%">
         <div className={classes.tableWrapper}>
-          {targets.length > 0 ? (
+          {subjectList.length > 0 ? (
             <Table aria-labelledby="tableTitle">
               <EnhancedTableHead
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
-                rowCount={targets.length}
+                rowCount={subjectList.length}
                 rows={rows}
               />
               <TableBody>
-                {stableSort(targets, getSorting(order, orderBy))
+                {stableSort(subjectList, getSorting(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => (
                     <TableRow hover tabIndex={-1} key={index}>
@@ -246,7 +236,7 @@ function CustomTable(props) {
                         <Box display="flex" justifyContent="flex-end">
                           <IconButton
                             className={classes.iconButton}
-                            // onClick={}
+                            // TODO onClick={}
                             aria-label="Edit"
                           >
                             <EditIcon className={classes.blackIcon} />
@@ -269,7 +259,7 @@ function CustomTable(props) {
           ) : (
             <Box m={2}>
               <HighlightedInformation>
-                No user yet.
+                No subject yet.
               </HighlightedInformation>
             </Box>
           )}
@@ -277,7 +267,7 @@ function CustomTable(props) {
         <div className={classes.alignRight}>
           <TablePagination
             component="div"
-            count={targets.length}
+            count={subjectList.length}
             rowsPerPage={rowsPerPage}
             page={page}
             backIconButtonProps={{
@@ -290,8 +280,8 @@ function CustomTable(props) {
             classes={{
               select: classes.dNone,
               selectIcon: classes.dNone,
-              actions: targets.length > 0 ? classes.dBlock : classes.dNone,
-              caption: targets.length > 0 ? classes.dBlock : classes.dNone,
+              actions: subjectList.length > 0 ? classes.dBlock : classes.dNone,
+              caption: subjectList.length > 0 ? classes.dBlock : classes.dNone,
             }}
             labelRowsPerPage=""
           />
@@ -303,8 +293,10 @@ function CustomTable(props) {
 
 CustomTable.propTypes = {
   classes: PropTypes.object.isRequired,
-  targets: PropTypes.arrayOf(PropTypes.object).isRequired,
-  setTargets: PropTypes.func.isRequired,
+  subjectList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  setSubjectList: PropTypes.func.isRequired,
+  teacherList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  setTeacherList: PropTypes.func.isRequired,
   pushMessageToSnackbar: PropTypes.func,
   openAddUserDialog: PropTypes.func.isRequired
 };

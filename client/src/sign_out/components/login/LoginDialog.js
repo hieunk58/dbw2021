@@ -58,7 +58,7 @@ function LoginDialog(props) {
       }, 1500);
     } else {
       setTimeout(() => {
-        history.push("/c/dashboard");
+        history.push("/c/users");
       }, 150);
     }
   }, [setIsLoading, loginEmail, loginPassword, history, setStatus]);

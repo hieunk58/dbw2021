@@ -64,6 +64,10 @@ const persons = [
     name: "Leonie",
   },
 ];
+
+// dummy subjects
+
+
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
@@ -75,11 +79,44 @@ function Main(props) {
   const { classes } = props;
   const [selectedTab, setSelectedTab] = useState(null);
   const [targets, setTargets] = useState([]);
-  // const [pushMessageToSnackbar, setPushMessageToSnackbar] = useState(null);
+  const [classList, setClassList] = useState([]);
+  const [subjectList, setSubjectList] = useState([]);
+  const [teacherList, setTeacherList] = useState([]);
+  const [pushMessageToSnackbar, setPushMessageToSnackbar] = useState(null);
 
   // TODO: fetch user list from api
   const fetchRandomTargets = useCallback(() => {
     const targets = [];
+    // take teacher from user list
+    const teacherList = [];
+    
+    //TODO check person is empty or not before access data
+    for (let i = 0; i < 20; i += 1) {
+      const randomPerson = persons[Math.floor(Math.random() * persons.length)];
+      const target = {
+        id: i,
+        number1: Math.floor(Math.random() * 251),
+        number2: Math.floor(Math.random() * 251),
+        number3: Math.floor(Math.random() * 251),
+        number4: Math.floor(Math.random() * 251),
+        name: randomPerson.name,
+        profilePicUrl: randomPerson.src,
+      };
+      targets.push(target);
+
+      const teacher = {
+        id: i, // TODO id should be id from Db
+        name: randomPerson.name
+      };
+      teacherList.push(teacher);
+    }
+    setTargets(targets);
+    setTeacherList(teacherList);
+  }, [setTargets, setTeacherList]);
+
+  const fetchRandomSubjects = useCallback(() => {
+    const targets = [];
+    //TODO check person is empty or not before access data
     for (let i = 0; i < 20; i += 1) {
       const randomPerson = persons[Math.floor(Math.random() * persons.length)];
       const target = {
@@ -93,12 +130,47 @@ function Main(props) {
       };
       targets.push(target);
     }
-    setTargets(targets);
-  }, [setTargets]);
+    setSubjectList(targets);
+
+  }, [setSubjectList]);
+
+  const fetchRandomClasses = useCallback(() => {
+    const targets = [];
+    //TODO check person is empty or not before access data
+    for (let i = 0; i < 20; i += 1) {
+      const randomPerson = persons[Math.floor(Math.random() * persons.length)];
+      const target = {
+        id: i,
+        number1: Math.floor(Math.random() * 251),
+        number2: Math.floor(Math.random() * 251),
+        number3: Math.floor(Math.random() * 251),
+        number4: Math.floor(Math.random() * 251),
+        name: randomPerson.name,
+        profilePicUrl: randomPerson.src,
+      };
+      targets.push(target);
+    }
+    setClassList(targets);
+
+  }, [setClassList]);
 
   const selectDashboard = useCallback(() => {
-    document.title = "TU Chemnitz - Dashboard";
-    setSelectedTab("Dashboard");
+    document.title = "TU Chemnitz - Users";
+    setSelectedTab("Users");
+    
+  }, [
+    setSelectedTab,
+  ]);
+  const selectClass = useCallback(() => {
+    document.title = "TU Chemnitz - Classes";
+    setSelectedTab("Classes");
+    
+  }, [
+    setSelectedTab,
+  ]);
+  const selectSubject = useCallback(() => {
+    document.title = "TU Chemnitz - Subjects";
+    setSelectedTab("Subjects");
     
   }, [
     setSelectedTab,
@@ -107,8 +179,10 @@ function Main(props) {
   useEffect(() => {
     // user list
     fetchRandomTargets();
-    // other list
-  }, [fetchRandomTargets]);
+    fetchRandomClasses();
+    fetchRandomSubjects();
+
+  }, [fetchRandomTargets, fetchRandomClasses, fetchRandomSubjects]);
 
   return (
     <Fragment>
@@ -118,9 +192,18 @@ function Main(props) {
       <main className={classNames(classes.main)}>
         <Routing
           selectDashboard={selectDashboard}
+          selectClass={selectClass}
+          selectSubject={selectSubject}
+          // targets is user list
           targets={targets}
           setTargets={setTargets}
-          // pushMessageToSnackbar={pushMessageToSnackbar}
+          classList={classList}
+          setClassList={setClassList}
+          subjectList={subjectList}
+          setSubjectList={setSubjectList}
+          teacherList={teacherList}
+          setTeacherList={setTeacherList}
+          pushMessageToSnackbar={pushMessageToSnackbar}
         />
       </main>
     </Fragment>

@@ -7,7 +7,7 @@ import FormDialog from "../../../shared/components/FormDialog";
 import ButtonCircularProgress from "../../../shared/components/ButtonCircularProgress";
 
 const AddUserDialog = withTheme(function (props) {
-  const { open, editMode, onClose, onSuccess } = props;
+  const { open, onClose, onSuccess } = props;
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
   const [surname, setSurname] = useState("");
@@ -29,7 +29,7 @@ const AddUserDialog = withTheme(function (props) {
       }}
       content={
         <Fragment>
-            <FormControl disabled={editMode} fullWidth required>
+            <FormControl fullWidth required>
                 <InputLabel id="role-label">Role</InputLabel>
                 <Select
                     labelId="role-label"
@@ -118,25 +118,6 @@ const AddUserDialog = withTheme(function (props) {
 AddUserDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   theme: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onSuccess: PropTypes.func.isRequired
-};
-
-// function Wrapper(props) {
-//   const { open, onClose, onSuccess } = props;
-//   return (
-//     <Elements>
-//       {open && (
-//         <AddUserDialog open={open} onClose={onClose} onSuccess={onSuccess} />
-//       )}
-//     </Elements>
-//   );
-// }
-
-
-AddUserDialog.propTypes = {
-  open: PropTypes.bool.isRequired,
-  editMode: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired
 };

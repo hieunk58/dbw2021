@@ -21,6 +21,8 @@ import {
   withWidth,
 } from "@material-ui/core";
 import DashboardIcon from "@material-ui/icons/Dashboard";
+import ClassIcon from "@material-ui/icons/Class";
+import SubjectIcon from "@material-ui/icons/Subject";
 import ImageIcon from "@material-ui/icons/Image";
 import PowerSettingsNewIcon from "@material-ui/icons/PowerSettingsNew";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -163,14 +165,14 @@ function NavBar(props) {
   // Menu items on left navigation bar: Dashboard, Logout, etc
   const menuItems = [
     {
-      link: "/c/dashboard",
-      name: "Dashboard",
+      link: "/c/users",
+      name: "Users",
       onClick: closeMobileDrawer,
       icon: {
         desktop: (
           <DashboardIcon
             className={
-              selectedTab === "Dashboard" ? classes.textSelected : "text-white"
+              selectedTab === "Users" ? classes.textSelected : "text-white"
             }
             fontSize="small"
           />
@@ -178,40 +180,40 @@ function NavBar(props) {
         mobile: <DashboardIcon className="text-white" />,
       },
     },
-    // {
-    //   link: "/c/posts",
-    //   name: "Posts",
-    //   onClick: closeMobileDrawer,
-    //   icon: {
-    //     desktop: (
-    //       <ImageIcon
-    //         className={
-    //           selectedTab === "Posts" ? classes.textPrimary : "text-white"
-    //         }
-    //         fontSize="small"
-    //       />
-    //     ),
-    //     mobile: <ImageIcon className="text-white" />,
-    //   },
-    // },
-    // {
-    //   link: "/c/subscription",
-    //   name: "Subscription",
-    //   onClick: closeMobileDrawer,
-    //   icon: {
-    //     desktop: (
-    //       <AccountBalanceIcon
-    //         className={
-    //           selectedTab === "Subscription"
-    //             ? classes.textPrimary
-    //             : "text-white"
-    //         }
-    //         fontSize="small"
-    //       />
-    //     ),
-    //     mobile: <AccountBalanceIcon className="text-white" />,
-    //   },
-    // },
+    {
+      link: "/c/classes",
+      name: "Classes",
+      onClick: closeMobileDrawer,
+      icon: {
+        desktop: (
+          <ClassIcon
+            className={
+              selectedTab === "Classes" ? classes.textSelected : "text-white"
+            }
+            fontSize="small"
+          />
+        ),
+        mobile: <ClassIcon className="text-white" />,
+      },
+    },
+    {
+      link: "/c/subjects",
+      name: "Subjects",
+      onClick: closeMobileDrawer,
+      icon: {
+        desktop: (
+          <SubjectIcon
+            className={
+              selectedTab === "Subjects"
+                ? classes.textSelected
+                : "text-white"
+            }
+            fontSize="small"
+          />
+        ),
+        mobile: <SubjectIcon className="text-white" />,
+      },
+    },
     {
       link: "/",
       name: "Logout",
