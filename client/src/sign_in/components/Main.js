@@ -65,8 +65,15 @@ const persons = [
   },
 ];
 
-// dummy subjects
+// dummy classes
+const dummy_classes = [
+  {id: 0, name: "Master of Automotive Software Engineering"},
+  {id: 1, name: "Master of Informatic"},
+  {id: 2, name: "Master of Biomedicine Technique"},
+];
 
+//TODO get all user has role=student, subjects
+// then fill each class based on classID
 
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -118,15 +125,10 @@ function Main(props) {
     const targets = [];
     //TODO check person is empty or not before access data
     for (let i = 0; i < 20; i += 1) {
-      const randomPerson = persons[Math.floor(Math.random() * persons.length)];
       const target = {
         id: i,
-        number1: Math.floor(Math.random() * 251),
-        number2: Math.floor(Math.random() * 251),
-        number3: Math.floor(Math.random() * 251),
-        number4: Math.floor(Math.random() * 251),
-        name: randomPerson.name,
-        profilePicUrl: randomPerson.src,
+        name: "Datenbanken und Webtechnik sommer semester 2021",
+        instructor: "Andre Windisch",
       };
       targets.push(target);
     }
@@ -135,22 +137,20 @@ function Main(props) {
   }, [setSubjectList]);
 
   const fetchRandomClasses = useCallback(() => {
-    const targets = [];
-    //TODO check person is empty or not before access data
-    for (let i = 0; i < 20; i += 1) {
-      const randomPerson = persons[Math.floor(Math.random() * persons.length)];
-      const target = {
-        id: i,
-        number1: Math.floor(Math.random() * 251),
-        number2: Math.floor(Math.random() * 251),
-        number3: Math.floor(Math.random() * 251),
-        number4: Math.floor(Math.random() * 251),
-        name: randomPerson.name,
-        profilePicUrl: randomPerson.src,
-      };
-      targets.push(target);
-    }
-    setClassList(targets);
+    // const targets = [];
+    // //TODO check person is empty or not before access data
+    // for (let i = 0; i < 20; i += 1) {
+    //   const randomPerson = persons[Math.floor(Math.random() * persons.length)];
+    //   const target = {
+    //     id: i,
+    //     // calculate the number of students and subjects in each class
+    //     number1: 3,
+    //     number2: 2,
+    //     name: randomPerson.name,
+    //   };
+      // targets.push(target);
+    // }
+    setClassList(dummy_classes);
 
   }, [setClassList]);
 

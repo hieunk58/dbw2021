@@ -23,6 +23,7 @@ import {
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import ClassIcon from "@material-ui/icons/Class";
 import SubjectIcon from "@material-ui/icons/Subject";
+import MessageRoundedIcon from '@material-ui/icons/MessageRounded';
 import ImageIcon from "@material-ui/icons/Image";
 import PowerSettingsNewIcon from "@material-ui/icons/PowerSettingsNew";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -33,44 +34,44 @@ import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
 import NavigationDrawer from "../../../shared/components/NavigationDrawer";
 
 const styles = (theme) => ({
-  // appBar: {
-  //   boxShadow: theme.shadows[6],
-  //   backgroundColor: theme.palette.common.white,
-  //   transition: theme.transitions.create(["width", "margin"], {
-  //     easing: theme.transitions.easing.sharp,
-  //     duration: theme.transitions.duration.leavingScreen,
-  //   }),
-  //   [theme.breakpoints.down("xs")]: {
-  //     width: "100%",
-  //     marginLeft: 0,
-  //   },
-  // },
-  // appBarToolbar: {
-  //   display: "flex",
-  //   justifyContent: "space-between",
-  //   paddingLeft: theme.spacing(1),
-  //   paddingRight: theme.spacing(1),
-  //   [theme.breakpoints.up("sm")]: {
-  //     paddingLeft: theme.spacing(2),
-  //     paddingRight: theme.spacing(2),
-  //   },
-  //   [theme.breakpoints.up("md")]: {
-  //     paddingLeft: theme.spacing(3),
-  //     paddingRight: theme.spacing(3),
-  //   },
-  //   [theme.breakpoints.up("lg")]: {
-  //     paddingLeft: theme.spacing(4),
-  //     paddingRight: theme.spacing(4),
-  //   },
-  // },
   appBar: {
     boxShadow: theme.shadows[6],
-    backgroundColor: theme.palette.common.black
+    backgroundColor: theme.palette.common.white,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    [theme.breakpoints.down("xs")]: {
+      width: "100%",
+      marginLeft: 0,
+    },
   },
   appBarToolbar: {
     display: "flex",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+    [theme.breakpoints.up("sm")]: {
+      paddingLeft: theme.spacing(2),
+      paddingRight: theme.spacing(2),
+    },
+    [theme.breakpoints.up("md")]: {
+      paddingLeft: theme.spacing(3),
+      paddingRight: theme.spacing(3),
+    },
+    [theme.breakpoints.up("lg")]: {
+      paddingLeft: theme.spacing(4),
+      paddingRight: theme.spacing(4),
+    },
   },
+  // appBar: {
+  //   boxShadow: theme.shadows[6],
+  //   backgroundColor: theme.palette.common.black
+  // },
+  // appBarToolbar: {
+  //   display: "flex",
+  //   justifyContent: "space-between"
+  // },
   accountAvatar: {
     backgroundColor: theme.palette.secondary.main,
     height: 24,
@@ -101,8 +102,7 @@ const styles = (theme) => ({
   },
   menuLink: {
     textDecoration: "none",
-    // color: theme.palette.text.primary,
-    color: "#ffffff",
+    color: theme.palette.text.primary,
   },
   iconListItem: {
     width: "auto",
@@ -117,9 +117,6 @@ const styles = (theme) => ({
   },
   textSelected: {
     color: theme.palette.common.pink,
-  },
-  mobileItemSelected: {
-    backgroundColor: `${theme.palette.primary.main} !important`,
   },
   brandText: {
     fontFamily: "'Baloo Bhaijaan', cursive",
@@ -143,31 +140,12 @@ function NavBar(props) {
   const { selectedTab, messages, classes, width } = props;
   // Will be use to make website more accessible by screen readers
   const links = useRef([]);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-//   const [isSideDrawerOpen, setIsSideDrawerOpen] = useState(false);
-
-  const openMobileDrawer = useCallback(() => {
-    setIsMobileOpen(true);
-  }, [setIsMobileOpen]);
-
-  const closeMobileDrawer = useCallback(() => {
-    setIsMobileOpen(false);
-  }, [setIsMobileOpen]);
-
-//   const openDrawer = useCallback(() => {
-//     setIsSideDrawerOpen(true);
-//   }, [setIsSideDrawerOpen]);
-
-//   const closeDrawer = useCallback(() => {
-//     setIsSideDrawerOpen(false);
-//   }, [setIsSideDrawerOpen]);
-
+  
   // Menu items on left navigation bar: Dashboard, Logout, etc
   const menuItems = [
     {
       link: "/c/users",
       name: "Users",
-      onClick: closeMobileDrawer,
       icon: {
         desktop: (
           <DashboardIcon
@@ -183,7 +161,6 @@ function NavBar(props) {
     {
       link: "/c/classes",
       name: "Classes",
-      onClick: closeMobileDrawer,
       icon: {
         desktop: (
           <ClassIcon
@@ -199,7 +176,6 @@ function NavBar(props) {
     {
       link: "/c/subjects",
       name: "Subjects",
-      onClick: closeMobileDrawer,
       icon: {
         desktop: (
           <SubjectIcon
@@ -229,28 +205,41 @@ function NavBar(props) {
     <Fragment>
       <AppBar position="sticky" className={classes.appBar}>
         <Toolbar className={classes.appBarToolbar}>
-          <Box display="flex" alignItems="center">
-            <Hidden smUp>
-              <Box mr={1}>
-                <IconButton
-                  aria-label="Open Navigation"
-                  onClick={openMobileDrawer}
-                  color="primary"
-                >
-                  <MenuIcon />
-                </IconButton>
-              </Box>
-            </Hidden>
-            <Hidden xsDown>
-              <Typography
-                variant="h4"
-                className={classes.brandText}
-                display="inline"
-                color="secondary"
-              >
-                TU Chemnitz
-              </Typography>
-            </Hidden>
+          <Box display="flex" alignItems="center" justifyContent="flex-start" width="100%">
+            <Typography
+              variant="h4"
+              className={classes.brandText}
+              display="inline"
+              color="secondary"
+            >
+              TU Chemnitz
+            </Typography>
+          </Box>
+          <Box
+            display="flex"
+            justifyContent="flex-end"
+            alignItems="center"
+            width="100%"
+          >
+            <IconButton>
+              <MessageRoundedIcon className={classes.primary} /> 
+            </IconButton>
+            <ListItem
+              disableGutters
+              className={classNames(classes.iconListItem, classes.smBordered)}
+            >
+              <Avatar
+                alt="profile picture"
+                src={`${process.env.PUBLIC_URL}/images/sign_in/image1.jpg`}
+                className={classNames(classes.accountAvatar)}
+              />
+              <ListItemText
+                className={classes.username}
+                primary={
+                  <Typography color="textPrimary">Username</Typography>
+                }
+              />
+            </ListItem>
           </Box>
         </Toolbar>
       </AppBar>

@@ -46,7 +46,7 @@ function Routing(props) {
   const {
     classes,
     pushMessageToSnackbar,
-    targets,
+    targets, // all user
     setTargets,
     subjectList,
     setSubjectList,
@@ -70,6 +70,9 @@ function Routing(props) {
           selectClass={selectClass}
           classList={classList}
           setClassList={setClassList}
+          subjectList={subjectList}
+          setSubjectList={setSubjectList}
+          studentList={targets} // get all user then filter by role=student
         />
         <PropsRoute
           path="/c/subjects"

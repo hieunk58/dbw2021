@@ -7,6 +7,7 @@ import {
   TablePagination,
   TableRow,
   IconButton,
+  Avatar,
   Box,
   Paper,
   Typography,
@@ -16,15 +17,15 @@ import {
   withStyles,
 } from "@material-ui/core";
 
+// import AutoComplete from "@material-ui/lab/"
 import DeleteIcon from "@material-ui/icons/Delete";
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
-import EditIcon from "@material-ui/icons/Edit";
 import EnhancedTableHead from "../../../shared/components/EnhancedTableHead";
 import stableSort from "../../../shared/functions/stableSort";
 import getSorting from "../../../shared/functions/getSorting";
 import HighlightedInformation from "../../../shared/components/HighlightedInformation";
 import ConfirmationDialog from "../../../shared/components/ConfirmationDialog";
-import AddSubjectDialog from "./AddSubjectDialog";
+import AddSubjectToClassDialog from "./AddSubjectToClassDialog";
 
 const styles = (theme) => ({
   tableWrapper: {
@@ -45,8 +46,12 @@ const styles = (theme) => ({
   confirmDialog: {
     color: theme.palette.common.pink,
   },
+  avatar: {
+    width: 28,
+    height: 28,
+  },
   firstData: {
-    paddingLeft: theme.spacing(2),
+    paddingLeft: theme.spacing(3),
   },
   iconButton: {
     padding: theme.spacing(1),
@@ -62,15 +67,16 @@ const styles = (theme) => ({
 const rows = [
   { id: "icon", numeric: true, label: "", },
   { id: "name", numeric: false, label: "Name", },
-  { id: "instructor", numeric: false, label: "Instructor" },
+  { id: "instructor", numeric: false, label: "Instructor", },
   { id: "actions", numeric: false, label: "", },
 ];
 
 const rowsPerPage = 25;
 
-function CustomTable(props) {
-  const { pushMessageToSnackbar, classes, subjectList, setSubjectList, teacherList, setTeacherList, 
-      openAddUserDialog, selectSubject } = props;
+
+
+function ManageSubject(props) {
+  const { pushMessageToSnackbar, classes, onClose } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
@@ -79,6 +85,8 @@ function CustomTable(props) {
   );
   const [deleteTargetDialogRow, setDeleteTargetDialogRow] = useState(null);
   const [isDeleteTargetLoading, setIsDeleteTargetLoading] = useState(false);
+
+  const [subjectList, setSubjectList] = useState([]);
 
   const [open, setOpen] = useState(false);
 
@@ -146,12 +154,39 @@ function CustomTable(props) {
     [setIsDeleteTargetDialogOpen, setDeleteTargetDialogRow]
   );
 
-  useEffect(selectSubject, [selectSubject]);
+  // dummy data
+  const fetchRandomSubjects = useCallback(() => {
+    const targets = [];
+    //TODO check person is empty or not before access data
+    for (let i = 0; i < 20; i += 1) {
+      const target = {
+        id: i,
+        name: "Datenbanken und Webtechnik sommer semester 2021",
+        instructor: "Andre Windisch",
+      };
+      targets.push(target);
+    }
+    setSubjectList(targets);
+  
+  }, [setSubjectList]);
+
+  useEffect(() => {
+    fetchRandomSubjects(); 
+  }, [fetchRandomSubjects]);
+  // useEffect(setSubjectList, [setSubjectList]);
 
   return (
     <Paper>
       <Toolbar className={classes.toolbar}>
         <Typography variant="h6">Subject List</Typography>
+        <Button 
+          variant="contained"
+          color="primary"
+          onClick={onClose}
+          disableElevation
+        >
+          Back
+        </Button>
         <Button
           variant="contained"
           color="secondary"
@@ -162,12 +197,12 @@ function CustomTable(props) {
         </Button>
       </Toolbar>
       
-      <AddSubjectDialog 
+      <AddSubjectToClassDialog 
         open={open}
         onClose={handleClose}
-        teacherList={teacherList}
+        subjectList={subjectList}
       >
-      </AddSubjectDialog>
+      </AddSubjectToClassDialog>
       <Divider />
       <ConfirmationDialog
         open={isDeleteTargetDialogOpen}
@@ -178,7 +213,7 @@ function CustomTable(props) {
             <span>
               {"Do you really want to remove this subject "}
               <b>{deleteTargetDialogRow.name}</b>
-              {" from your list?"}
+              {" from the class?"}
             </span>
           ) : null
         }
@@ -207,7 +242,11 @@ function CustomTable(props) {
                         scope="row"
                         className={classes.firstData}
                       >
-                        <LibraryBooksIcon className={classes.blackIcon}/>
+                        <IconButton
+                          className="classes.iconButton"
+                        >
+                          <LibraryBooksIcon className={classes.blackIcon} />
+                        </IconButton>
                       </TableCell>
                       <TableCell component="th" scope="row">
                         {row.name}
@@ -215,15 +254,9 @@ function CustomTable(props) {
                       <TableCell component="th" scope="row">
                         {row.instructor}
                       </TableCell>
+                      
                       <TableCell component="th" scope="row">
                         <Box display="flex" justifyContent="flex-end">
-                          <IconButton
-                            className={classes.iconButton}
-                            // TODO onClick={}
-                            aria-label="Edit"
-                          >
-                            <EditIcon className={classes.blackIcon} />
-                          </IconButton>
                           <IconButton
                             className={classes.iconButton}
                             onClick={() => {
@@ -274,15 +307,13 @@ function CustomTable(props) {
   );
 }
 
-CustomTable.propTypes = {
+ManageSubject.propTypes = {
   classes: PropTypes.object.isRequired,
-  subjectList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  setSubjectList: PropTypes.func.isRequired,
-  teacherList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  setTeacherList: PropTypes.func.isRequired,
   pushMessageToSnackbar: PropTypes.func,
   openAddUserDialog: PropTypes.func.isRequired,
-  selectSubject: PropTypes.func.isRequired
+  onClose: PropTypes.func,
+  subjectList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  setSubjectList: PropTypes.func.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(CustomTable);
+export default withStyles(styles, { withTheme: true })(ManageSubject);
