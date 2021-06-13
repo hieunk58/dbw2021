@@ -16,6 +16,7 @@ import {
   withStyles,
 } from "@material-ui/core";
 
+import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import EditIcon from "@material-ui/icons/Edit";
@@ -156,6 +157,7 @@ function CustomTable(props) {
           variant="contained"
           color="secondary"
           onClick={handleClickOpen}
+          startIcon={<AddIcon/>}
           disableElevation
         >
           Add Subject

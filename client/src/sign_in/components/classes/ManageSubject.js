@@ -7,7 +7,6 @@ import {
   TablePagination,
   TableRow,
   IconButton,
-  Avatar,
   Box,
   Paper,
   Typography,
@@ -17,7 +16,6 @@ import {
   withStyles,
 } from "@material-ui/core";
 
-// import AutoComplete from "@material-ui/lab/"
 import DeleteIcon from "@material-ui/icons/Delete";
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import EnhancedTableHead from "../../../shared/components/EnhancedTableHead";

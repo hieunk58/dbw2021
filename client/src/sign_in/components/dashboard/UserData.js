@@ -17,6 +17,7 @@ import {
   withStyles,
 } from "@material-ui/core";
 
+import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import EnhancedTableHead from "../../../shared/components/EnhancedTableHead";
@@ -176,6 +177,7 @@ function CustomTable(props) {
           variant="contained"
           color="secondary"
           onClick={handleClickOpen}
+          startIcon={<AddIcon/>}
           disableElevation
         >
           Add User

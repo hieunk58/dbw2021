@@ -17,6 +17,7 @@ import {
   withStyles,
 } from "@material-ui/core";
 
+import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
 import GroupsIcon from "@material-ui/icons/GroupAdd";
 import SubjectIcon from "@material-ui/icons/Subject";
@@ -83,7 +84,7 @@ const rows = [
 const rowsPerPage = 25;
 
 function CustomTable(props) {
-  const { pushMessageToSnackbar, classes, classList, studentList, selectClass,
+  const { pushMessageToSnackbar, classes, classList, selectClass,
       openAddUserDialog } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
@@ -95,6 +96,7 @@ function CustomTable(props) {
   const [isDeleteTargetLoading, setIsDeleteTargetLoading] = useState(false);
 
   const [subjectList, setSubjectList] = useState([]);
+  const [studentList, setStudentList] = useState([]);
 
   const [open, setOpen] = useState(false);
 
@@ -183,8 +185,18 @@ function CustomTable(props) {
 
   useEffect(() => {
     selectClass(); // selected tab (pink color)
-  }, [selectClass]);
+    setStudentList();
+  }, [selectClass, setStudentList]);
 
+  // Open manage student page
+  if(isManageStudentPageOpen)
+  {
+    return <ManageStudent
+        studentList={studentList}
+        setStudentList={setStudentList}
+        onClose={closeManageStudentPage}
+      />
+  }
   // Open manage subject page
   if(isManageSubjectPageOpen)
   {
@@ -192,15 +204,6 @@ function CustomTable(props) {
         subjectList={subjectList}
         setSubjectList={setSubjectList}
         onClose={closeManageSubjectPage} 
-      />
-  }
-  // Open manage student page
-  else if(isManageStudentPageOpen)
-  {
-    return <ManageStudent
-        subjectList={subjectList}
-        setSubjectList={setSubjectList}
-        onClose={closeManageStudentPage}
       />
   }
 
@@ -212,6 +215,7 @@ function CustomTable(props) {
           variant="contained"
           color="secondary"
           onClick={handleClickOpen}
+          startIcon={<AddIcon/>}
           disableElevation
         >
           ADD CLASS
@@ -365,6 +369,7 @@ CustomTable.propTypes = {
   subjectList: PropTypes.arrayOf(PropTypes.object).isRequired,
   setSubjectList: PropTypes.func.isRequired,
   studentList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  setStudentList: PropTypes.func.isRequired,
   teacherList: PropTypes.arrayOf(PropTypes.object).isRequired,
   setTeacherList: PropTypes.func.isRequired,
   pushMessageToSnackbar: PropTypes.func,

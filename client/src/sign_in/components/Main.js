@@ -89,6 +89,7 @@ function Main(props) {
   const [classList, setClassList] = useState([]);
   const [subjectList, setSubjectList] = useState([]);
   const [teacherList, setTeacherList] = useState([]);
+  const [studentList, setStudentList] = useState([]);
   const [pushMessageToSnackbar, setPushMessageToSnackbar] = useState(null);
 
   // TODO: fetch user list from api
@@ -120,6 +121,22 @@ function Main(props) {
     setTargets(targets);
     setTeacherList(teacherList);
   }, [setTargets, setTeacherList]);
+
+ // dummy data
+ const fetchRandomStudents = useCallback(() => {
+  const students = [];
+  //TODO check person is empty or not before access data
+  for (let i = 0; i < 20; i += 1) {
+    const student = {
+      id: i,
+      name: "Daniel Richter",
+      username: "dr2021"
+    };
+    students.push(student);
+  }
+  setStudentList(students);
+
+}, [setStudentList]);
 
   const fetchRandomSubjects = useCallback(() => {
     const targets = [];
@@ -181,8 +198,9 @@ function Main(props) {
     fetchRandomTargets();
     fetchRandomClasses();
     fetchRandomSubjects();
+    fetchRandomStudents();
 
-  }, [fetchRandomTargets, fetchRandomClasses, fetchRandomSubjects]);
+  }, [fetchRandomTargets, fetchRandomClasses, fetchRandomSubjects, fetchRandomStudents]);
 
   return (
     <Fragment>
@@ -203,6 +221,8 @@ function Main(props) {
           setSubjectList={setSubjectList}
           teacherList={teacherList}
           setTeacherList={setTeacherList}
+          studentList={studentList}
+          setStudentList={setStudentList}
           pushMessageToSnackbar={pushMessageToSnackbar}
         />
       </main>

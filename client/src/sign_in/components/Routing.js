@@ -56,7 +56,9 @@ function Routing(props) {
     selectClass,
     selectSubject,
     teacherList,
-    setTeacherList
+    setTeacherList,
+    studentList,
+    setStudentList
     // openAddBalanceDialog,
   } = props;
 
@@ -72,7 +74,8 @@ function Routing(props) {
           setClassList={setClassList}
           subjectList={subjectList}
           setSubjectList={setSubjectList}
-          studentList={targets} // get all user then filter by role=student
+          studentList={studentList} // get all user then filter by role=student
+          setStudentList={setStudentList}
         />
         <PropsRoute
           path="/c/subjects"
@@ -111,6 +114,8 @@ Routing.propTypes = {
   selectDashboard: PropTypes.func.isRequired,
   selectClass: PropTypes.func.isRequired,
   selectSubject: PropTypes.func.isRequired,
+  studentList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  setStudentList: PropTypes.func.isRequired,
   
   // openAddBalanceDialog: PropTypes.func.isRequired,
 };
