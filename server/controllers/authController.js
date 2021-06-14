@@ -78,20 +78,12 @@ exports.signin = (req, res) => {
         expiresIn: 86400 // 24 hours
       });
 
-      // var authority = "ROLE_" + user.role.name;
-      var authorities = [];
-
-      for (let i = 0; i < user.role.length; i++) {
-        authorities.push("ROLE_" + user.role[i].name.toUpperCase());
-      }
-      
       res.status(200).send({
         id: user._id,
         first_name: user.first_name,
         family_name: user.family_name,
         username: user.username,
-        // role: authorities,
-        role: user.role[0].name, // user.role is an array of 1 element
+        role: user.role.name,
         accessToken: token
       });
     });

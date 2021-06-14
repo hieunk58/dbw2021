@@ -41,6 +41,7 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRouter);
+app.use('/api', userRouter);
 
 // route not found
 app.use((req, res, next) => {
