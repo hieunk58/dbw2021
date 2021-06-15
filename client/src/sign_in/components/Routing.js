@@ -5,6 +5,7 @@ import { withStyles } from "@material-ui/core";
 import Dashboard from "./dashboard/Dashboard";
 import Classes from "./classes/Classes";
 import Subjects from "./subjects/Subjects";
+import StudentPage from "./student/StudentPage"
 import PropsRoute from "../../shared/components/PropsRoute";
 
 const styles = (theme) => ({
@@ -82,12 +83,13 @@ function Routing(props) {
           component={Subjects}
           pushMessageToSnackbar={pushMessageToSnackbar}
           selectSubject={selectSubject}
-          subjectList={subjectList}
-          setSubjectList={setSubjectList}
+          // subjectList={subjectList}
+          // setSubjectList={setSubjectList}
           teacherList={teacherList}
           setTeacherList={setTeacherList}
         />
         <PropsRoute
+          // path="/c/users"
           path=""
           component={Dashboard}
           pushMessageToSnackbar={pushMessageToSnackbar}
@@ -95,6 +97,21 @@ function Routing(props) {
           setTargets={setTargets}
           selectDashboard={selectDashboard}
         />
+        {/* <PropsRoute
+          // student view
+          // path="/profile/student"
+          path="/c/users"
+          component={StudentPage}
+        /> */}
+        {/* <PropsRoute
+          // teacher view
+          path="/profile/teacher"
+          component={Dashboard}
+          pushMessageToSnackbar={pushMessageToSnackbar}
+          targets={targets}
+          setTargets={setTargets}
+          selectDashboard={selectDashboard}
+        /> */}
       </Switch>
     </div>
   );

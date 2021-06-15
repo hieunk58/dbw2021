@@ -59,6 +59,13 @@ function LoginDialog(props) {
     } else {
       setTimeout(() => {
         history.push("/c/users");
+        // check user role to open corresponding view
+        // admin view starts with managing users
+        // history.push("/c/subjects");
+        // TODO teacher view
+        //history.push("/profile/teacher");
+        // TODO student view
+        // history.push("/profile/student");
       }, 150);
     }
   }, [setIsLoading, loginEmail, loginPassword, history, setStatus]);
