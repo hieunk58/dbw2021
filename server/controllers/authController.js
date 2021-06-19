@@ -6,47 +6,6 @@ const Role = db.role;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
-exports.signup = (req, res) => {
-  // res.send({ message: "User was registered successfully!" });
-  const user = new User({
-    first_name: req.body.first_name,
-    family_name: req.body.family_name,
-    username: req.body.username,
-    password: bcrypt.hashSync(req.body.password, 8)
-  });
-
-  user.save((err, user) => {
-    if (err) {
-      res.status(500).send({ message: err });
-      return;
-    }
-
-    if (req.body.role) {
-      Role.findOne(
-        {
-          name: req.body.role
-        },
-        (err, role) => {
-          if (err) {
-            res.status(500).send({ message: err });
-            return;
-          }
-
-          user.role = role._id;
-          user.save(err => {
-            if (err) {
-              res.status(500).send({ message: err });
-              return;
-            }
-
-            res.send({ message: "User was registered successfully!", role: role.name});
-          });
-        }
-      );
-    }
-  });
-};
-
 exports.signin = (req, res) => {
   User.findOne({
     username: req.body.username

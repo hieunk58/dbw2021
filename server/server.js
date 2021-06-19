@@ -4,6 +4,7 @@ const dbConfig = require("./config/db.config");
 // routes
 var userRouter = require('./routes/user');
 var authRouter = require('./routes/auth');
+var managementRouter = require('./routes/management');
 
 const app = express();
 // Used to create some test data
@@ -29,10 +30,10 @@ app.use(express.json());
 // app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.urlencoded({ extended: false }));
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT;
 
 // console.log that server is up and running
-app.listen(process.env.PORT || 8080, () => console.log('Listening on port ${process.env.PORT || 8080}!'));
+app.listen(port, () => console.log('Listening on port ${port}!'));
 
 // create a GET route
 app.get('/', (req, res) => {
@@ -41,7 +42,7 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRouter);
-app.use('/api', userRouter);
+app.use('/api/manage/', managementRouter);
 
 // route not found
 app.use((req, res, next) => {

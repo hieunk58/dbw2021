@@ -4,9 +4,9 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var TestSchema = new Schema({
-  name: { type: String, required: true, maxLength: 200 },
-  test_date: { type: Date, default: Date.now },
-  subject: [{ type: Schema.ObjectId, ref: 'Subject' }],
+  test_name: { type: String, required: true, maxLength: 200 },
+  test_date: { type: Date, default: Date.now, required: true },
+  subject: { type: Schema.ObjectId, ref: 'Subject', required: true }
 });
 
 // Virtual for test's url
@@ -22,4 +22,4 @@ TestSchema
     return DateTime.fromJSDate(this.test_date).toLocaleString(DateTime.DATETIME_MED);
 });
 // Export model.
-module.exports = mongoose.model('Subject', TestSchema);
+module.exports = mongoose.model('Test', TestSchema);

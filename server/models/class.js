@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var ClassSchema = new Schema({
-  class_name: { type: String, required: true, unique: true, dropDups: true, maxLength: 200 },
+  class_name: { type: String, required: true, unique: true, maxLength: 200 },
 //   subject: [{ type: Schema.ObjectId, ref: 'Subject' }], // subject list: 0..N
 //   student: [{ type: Schema.ObjectId, ref: 'User' }], // student list: 0..N
 });
@@ -16,4 +16,4 @@ ClassSchema
 });
 
 // Export model.
-module.exports = mongoose.model('Subject', ClassSchema);
+module.exports = mongoose.model('Class', ClassSchema);
