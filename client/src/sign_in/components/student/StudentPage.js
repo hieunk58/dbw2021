@@ -7,6 +7,7 @@ import {
   TablePagination,
   TableRow,
   IconButton,
+  Tooltip,
   Box,
   Paper,
   Typography,
@@ -15,12 +16,16 @@ import {
   withStyles,
 } from "@material-ui/core";
 
-import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
-import AssignmentIcon from "@material-ui/icons/Assignment";
+import LibraryBooksIcon from '@material-ui/icons/ChromeReaderMode';
+import SubjectIcon from "@material-ui/icons/Subject";
+// import AssignmentIcon from "@material-ui/icons/Assignment";
 import EnhancedTableHead from "../../../shared/components/EnhancedTableHead";
 import stableSort from "../../../shared/functions/stableSort";
 import getSorting from "../../../shared/functions/getSorting";
 import HighlightedInformation from "../../../shared/components/HighlightedInformation";
+import DataService from "../../../services/data.service";
+// import AuthService from "../../../services/auth.service";
+// import ManageTest from "./ManageTest";
 
 const styles = (theme) => ({
   tableWrapper: {
@@ -28,6 +33,7 @@ const styles = (theme) => ({
   },
   toolbar: {
     justifyContent: "space-between",
+    // justifyContent: "center",
   },
   alignRight: {
     display: "flex",
@@ -57,29 +63,38 @@ const styles = (theme) => ({
 
 const rows = [
   { id: "icon", numeric: true, label: "", },
-  { id: "name", numeric: false, label: "Subject Name", },
-  { id: "grade", numeric: true, label: "Average Grade" },
+  { id: "name", numeric: false, label: "Subject name", },
+  { id: "className", numeric: false, label: "Class" },
   { id: "actions", numeric: false, label: "", },
 ];
 
 const rowsPerPage = 25;
 
 function CustomTable(props) {
-  const { classes } = props;
+  // const location = useLocation();
+  const { classes, currentUser, pushMessageToSnackbar, subjectListByTeacher } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
-  const [subjectList, setSubjectList] = useState([]);
+  // const [currentUser, setCurrentUser] = useState(undefined);
+  // const [isManageTestPageOpen, setIsManageTestPageOpen] = useState(false);
+  
+  // const [currentSelectedSubject, setCurrentSelectedSubject] = useState(null);
+  // test list is all test
+  // const [testList, setTestList] = useState([]);
+  // extract test by subject id from test list
+  const [testListBySubject, setTestListBySubject] = useState([]);
+  // const [subjectListByTeacher, setSubjectListByTeacher] = useState([]);
 
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+  // const handleClickOpen = () => {
+  //   setOpen(true);
+  // };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  // const handleClose = () => {
+  //   setOpen(false);
+  // };
 
   const handleRequestSort = useCallback(
     (__, property) => {
@@ -101,22 +116,34 @@ function CustomTable(props) {
     [setPage]
   );
 
-  const fetchRandomSubjects = useCallback(() => {
-    const targets = [];
-    //TODO check person is empty or not before access data
-    for (let i = 0; i < 10; i += 1) {
-      const target = {
-        id: i,
-        name: "Formal Specification and Verification",
-        grade: 1
-      };
-      targets.push(target);
-    }
-    setSubjectList(targets);
+  const fetchTestListBySubject = useCallback((currentSubject) => {
+    // get test list by subject id
+    console.log(" fetchTestListBySubject id: ", currentSubject);
+    DataService.getSubjectDetail(currentSubject._id)
+    .then((res) => {
+      console.log("test list by subject: ", res.data.list_test);
+      setTestListBySubject(res.data.list_test);
+    })
+    .catch((error) => {
+      console.log("error: ", error.response.data.message);
+      pushMessageToSnackbar({
+        text: error.response.data.message,
+      });
+    })
+    // return await response;
+  }, [pushMessageToSnackbar]);
 
-  }, [setSubjectList]);
+  // const openManageTestPage = useCallback((row) => {
+  //   setCurrentSelectedSubject(row);
+  //   console.log("get test list by subject id: ", row._id);
+  //   // fetchTestListBySubject(row)
+  //   setIsManageTestPageOpen(true);
+  // }, []);
 
-  useEffect(fetchRandomSubjects, [fetchRandomSubjects]);
+  // const closeManageTestPage = useCallback(() => {
+  //   setIsManageTestPageOpen(false);
+  // }, [setIsManageTestPageOpen]);
+
 
   return (
     <Paper>
@@ -126,17 +153,17 @@ function CustomTable(props) {
       <Divider />
       <Box width="100%">
         <div className={classes.tableWrapper}>
-          {subjectList.length > 0 ? (
+          {subjectListByTeacher.length > 0 ? (
             <Table aria-labelledby="tableTitle">
               <EnhancedTableHead
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
-                rowCount={subjectList.length}
+                rowCount={subjectListByTeacher.length}
                 rows={rows}
               />
               <TableBody>
-                {stableSort(subjectList, getSorting(order, orderBy))
+                {stableSort(subjectListByTeacher, getSorting(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => (
                     <TableRow hover tabIndex={-1} key={index}>
@@ -145,24 +172,33 @@ function CustomTable(props) {
                         scope="row"
                         className={classes.firstData}
                       >
-                        <LibraryBooksIcon className={classes.blackIcon}/>
+                        <IconButton className="classes.iconButton">
+                          <LibraryBooksIcon className={classes.blackIcon}/>
+                        </IconButton>
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.name}
+                        {row.subject_name}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.grade}
+                        {row.score}
                       </TableCell>
                       <TableCell component="th" scope="row">
                         <Box display="flex" justifyContent="flex-end">
-                          <IconButton
-                            className={classes.iconButton}
-                            // TODO onClick={openTestResultDetails}
-                            aria-label="Detail"
+                        
+                          <Tooltip
+                            title="Test results"
+                            placement="top"
                           >
-                            <AssignmentIcon className={classes.blackIcon} />
-                          </IconButton>
-                          
+                            <IconButton
+                              className={classes.iconButton}
+                              onClick={() => {
+                                // openTestResultDetail(row)
+                              }}
+                              aria-label="Results"
+                            >
+                              <SubjectIcon className={classes.blackIcon} />
+                            </IconButton>
+                          </Tooltip>
                         </Box>
                       </TableCell>
                     </TableRow>
@@ -180,7 +216,7 @@ function CustomTable(props) {
         <div className={classes.alignRight}>
           <TablePagination
             component="div"
-            count={subjectList.length}
+            count={subjectListByTeacher.length}
             rowsPerPage={rowsPerPage}
             page={page}
             backIconButtonProps={{
@@ -193,8 +229,8 @@ function CustomTable(props) {
             classes={{
               select: classes.dNone,
               selectIcon: classes.dNone,
-              actions: subjectList.length > 0 ? classes.dBlock : classes.dNone,
-              caption: subjectList.length > 0 ? classes.dBlock : classes.dNone,
+              actions: subjectListByTeacher.length > 0 ? classes.dBlock : classes.dNone,
+              caption: subjectListByTeacher.length > 0 ? classes.dBlock : classes.dNone,
             }}
             labelRowsPerPage=""
           />
@@ -206,8 +242,10 @@ function CustomTable(props) {
 
 CustomTable.propTypes = {
   classes: PropTypes.object.isRequired,
-  subjectList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  setSubjectList: PropTypes.func.isRequired,
+  currentUser: PropTypes.object.isRequired,
+  subjectListByTeacher: PropTypes.arrayOf(PropTypes.object).isRequired,
+  setSubjectListByTeacher: PropTypes.func.isRequired,
+  pushMessageToSnackbar: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(CustomTable);

@@ -108,15 +108,19 @@ function Main(props) {
         setSubjectList(subjectList);
         // filter subject by current signed in teacher
         // for student just filter with class id
-        var subjects = [];
-        for(let i = 0; i < list.length; ++i) {
-          if(list[i].teacher._id === currentUser.id) {
-            subjects.push(list[i]);
+        if(currentUser) {
+          var subjects = [];
+          for(let i = 0; i < list.length; ++i) {
+            console.log("teacher id: ", list[i].teacher._id);
+            if(list[i].teacher._id === currentUser.id) {
+              subjects.push(list[i]);
+            }
           }
+          setSubjectListByTeacher(subjects);
+          console.log("subject list by teacher: ", subjectListByTeacher);
+          // setSubjectList(subjects);
+
         }
-        setSubjectListByTeacher(subjects);
-        console.log("subject list by teacher: ", subjectListByTeacher);
-        // setSubjectList(subjects);
       });
 
   }, []);

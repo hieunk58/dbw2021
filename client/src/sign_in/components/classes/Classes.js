@@ -88,8 +88,7 @@
   function CustomTable(props) {
     const editForm = useRef();
 
-    const { pushMessageToSnackbar, classes, selectClass, 
-      classList, setClassList, onSuccess} = props;
+    const { pushMessageToSnackbar, classes, selectClass, onSuccess} = props;
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState(null);
     const [page, setPage] = useState(0);
@@ -103,6 +102,7 @@
     const [subjectList, setSubjectList] = useState([]);
     const [teacherList, setTeacherList] = useState([]);
     const [studentList, setStudentList] = useState([]);
+    const [classList, setClassList] = useState([]);
     const [subjectByClass, setSubjectByClass] = useState([]);
 
     const [open, setOpen] = useState(false);
@@ -126,7 +126,7 @@
     const fetchSubjectList = useCallback(() => {
       DataService.getSubjectList()
         .then(res => {
-          console.log("[Main.js] get subject list using api: ", res.data);
+          console.log("get subject list using api: ", res.data);
           setSubjectList(res.data.subject_list);
           // filter subject by current signed in teacher
           // for student just filter with class id
@@ -281,11 +281,18 @@
     );
 
     useEffect(() => {
-      selectClass(); // selected tab (pink color)
+      // selectClass(); // selected tab (pink color)
       //fetchClassList();
       fetchSubjectList();
+      // fetchTeacherList();
+    }, [fetchSubjectList, isManageSubjectPageOpen]);
+
+    useEffect(() => {
+      selectClass(); // selected tab (pink color)
+      fetchClassList();
+      // fetchSubjectList();
       fetchTeacherList();
-    }, [fetchSubjectList, fetchTeacherList, selectClass]);
+    }, [fetchClassList, fetchTeacherList, selectClass]);
 
     // Open manage student page
     if(isManageStudentPageOpen)
@@ -302,9 +309,9 @@
     {
       return <ManageSubject
           subjectList={subjectByClass}
-          onSuccess={onSuccess}
+          setSubjectList={setSubjectByClass}
+          // onSuccess={fetchSubjectList}
           // subjectList={subjectList}
-          // setSubjectList={setSubjectByClass}
           teacherList={teacherList}
           currentClass={currentSelectedClass}
           // setTeacherList={setTeacherList}
@@ -488,6 +495,7 @@
   CustomTable.propTypes = {
     classes: PropTypes.object.isRequired,
     classList: PropTypes.arrayOf(PropTypes.object).isRequired,
+    setClassList: PropTypes.func.isRequired,
     subjectList: PropTypes.arrayOf(PropTypes.object).isRequired,
     setSubjectList: PropTypes.func.isRequired,
     studentList: PropTypes.arrayOf(PropTypes.object).isRequired,

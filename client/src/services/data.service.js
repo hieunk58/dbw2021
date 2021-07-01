@@ -45,6 +45,10 @@ class DataService {
         console.log("getSubjectList");
         return api.get('/subjects'); 
     }
+    // getSubjectByClass(id) { 
+    //     console.log("getSubjectList");
+    //     return api.get('/subjects'); 
+    // }
     getSubjectDetail(id) { 
         console.log("getSubjectDetail");
         return api.get(`/subject/${id}`); 

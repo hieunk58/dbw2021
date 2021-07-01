@@ -10,6 +10,7 @@ import NavBar from "./navigation/NavBar";
 // import dummyBlogPosts from "../dummy_data/blogPosts";
 import DialogSelector from "./login/DialogSelector";
 import Routing from "./Routing";
+import SignIn from "./SignIn";
 // import smoothScrollTop from "../../shared/functions/smoothScrollTop";
 
 // AOS.init({ once: true });
@@ -66,6 +67,9 @@ function Main(props) {
 
   return (
     <div className={classes.wrapper}>
+      {/* <SignIn>
+
+      </SignIn> */}
       
       <DialogSelector
         openLoginDialog={openLoginDialog}

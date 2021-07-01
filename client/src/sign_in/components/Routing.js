@@ -77,7 +77,7 @@ function Routing(props) {
           selectClass={selectClass}
           classList={classList}
           teacherList={teacherList}
-          // setClassList={setClassList}
+          setClassList={setClassList}
           subjectList={subjectList}
           // setSubjectList={setSubjectList}
           // studentList={studentList} // get all user then filter by role=student

@@ -8,28 +8,30 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
+// import FormControlLabel from '@material-ui/core/FormControlLabel';
+// import Checkbox from '@material-ui/core/Checkbox';
+// import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
-import Box from '@material-ui/core/Box';
+// import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://tu-chemnitz.de">
-        TU Chemnitz
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import AuthService from "../../services/auth.service";
+
+// function Copyright() {
+//   return (
+//     <Typography variant="body2" color="textSecondary" align="center">
+//       {'Copyright © '}
+//       <Link color="inherit" href="https://tu-chemnitz.de">
+//         TU Chemnitz
+//       </Link>{' '}
+//       {new Date().getFullYear()}
+//       {'.'}
+//     </Typography>
+//   );
+// }
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -72,29 +74,46 @@ function SignInSide(props) {
 
   const [isLoading, setIsLoading] = useState(false);
   // const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const loginEmail = useRef();
+  const loginUsername = useRef();
   const loginPassword = useRef();
 
   const login = useCallback(() => {
     console.log("call login");
+    // setIsLoading(true);
+    // setStatus(null);
+    // if (loginUsername.current.value !== "admin@tu-chemnitz.com") {
+    //   setTimeout(() => {
+    //     setStatus("invalidUsername");
+    //     setIsLoading(false);
+    //   }, 1500);
+    // } else if (loginPassword.current.value !== "Test@123456") {
+    //   setTimeout(() => {
+    //     setStatus("invalidPassword");
+    //     setIsLoading(false);
+    //   }, 1500);
+    // } else {
+    //   setTimeout(() => {
+    //     history.push("/c/dashboard");
+    //   }, 150);
+    // }
     setIsLoading(true);
-    setStatus(null);
-    if (loginEmail.current.value !== "admin@tu-chemnitz.com") {
-      setTimeout(() => {
-        setStatus("invalidEmail");
-        setIsLoading(false);
-      }, 1500);
-    } else if (loginPassword.current.value !== "Test@123456") {
-      setTimeout(() => {
-        setStatus("invalidPassword");
-        setIsLoading(false);
-      }, 1500);
-    } else {
-      setTimeout(() => {
-        history.push("/c/dashboard");
-      }, 150);
-    }
-  }, [setIsLoading, loginEmail, loginPassword, history, setStatus]);
+      setStatus(null);
+
+      AuthService.login(loginUsername.current.value, loginPassword.current.value)
+      .then((res) => {
+        console.log("login user: ", res);
+        console.log("login user role: ", res.role);
+        if(res.role === 'admin') {
+          console.log('user is admin');
+          history.push("/c/users");
+        } else if(res.role === 'teacher') {
+          history.push("/c/teacher");
+        } else {
+          history.push("/c/student");
+        }
+      })
+      setIsLoading(false);
+  }, [setIsLoading, loginUsername, loginPassword, history, setStatus]);
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -112,22 +131,22 @@ function SignInSide(props) {
             <TextField
               variant="outlined"
               margin="normal"
-              error={status === "invalidEmail"}
+              error={status === "invalidUsername"}
               required
               fullWidth
-              label="Email Address"
-              inputRef={loginEmail}
+              label="Username"
+              inputRef={loginUsername}
               autoFocus
               autoComplete="off"
-              type="email"
+              type="username"
               onChange={() => {
-                if (status === "invalidEmail") {
+                if (status === "invalidUsername") {
                   setStatus(null);
                 }
               }}
               helperText={
-                status === "invalidEmail" &&
-                "This email address isn't associated with an account."
+                status === "invalidUsername" &&
+                "This username isn't associated with an account."
               }
               FormHelperTextProps={{ error: true }}
             />
@@ -203,4 +222,4 @@ SignInSide.propTypes = {
   status: PropTypes.string,
 };
 
-export default SignInSide;
+export default withRouter(SignInSide);

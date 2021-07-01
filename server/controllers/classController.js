@@ -33,12 +33,13 @@ exports.class_detail = function (req, res, next) {
             Class.findById(req.params.id)
                 .exec(callback)
         },
-        class_students: function (callback) {
-            User.find({ 'class': req.params.id, 'role': "student" })
-                .exec(callback)
-        },
+        // class_students: function (callback) {
+        //     User.find({ 'class': req.params.id, 'role': "student" })
+        //         .exec(callback)
+        // },
         class_subjects: function (callback) {
             Subject.find({ 'class': req.params.id })
+                .populate('teacher')
                 .exec(callback)
         },
     }, function (err, results) {
@@ -55,7 +56,7 @@ exports.class_detail = function (req, res, next) {
             return next(err);
         }
         // Successful
-        res.send({ class: results.class, student_list: results.classs_students, 
+        res.send({ class: results.class,
             subject_list: results.class_subjects });
     });
 
