@@ -1,8 +1,9 @@
 // var Class = require('../models/class')
 var async = require('async')
 // var Student = require('../models/user') // user with role="student"
-// var User = require('../models/user') // user with role="student", role="teacher"
+var User = require('../models/user') // user with role="student", role="teacher"
 var Subject = require('../models/subject')
+var Test = require('../models/test')
 var Result = require('../models/result')
 
 
@@ -11,11 +12,12 @@ exports.subject_list = function (req, res, next) {
 
     Subject.find()
         .sort([['subject_name', 'ascending']])
+        .populate('teacher')
+        .populate('class')
         .exec(function (err, list_subjects) {
             if (err) { 
                 res.status(500).send({
-                    message:
-                      err.message || "Cannot retrieve subject list."
+                    message: "Cannot retrieve subject list."
                   });
                 return;
             }
@@ -27,9 +29,10 @@ exports.subject_list = function (req, res, next) {
 
 // Display subject detail (show all test list)
 exports.subject_detail = function (req, res, next) {
+    var id = req.params.id;
     async.parallel({
         suject: function(callback) {
-            Subject.findById(id).exec(callback);
+            Subject.findById().exec(callback);
         },
         // find all test that have subject id = subject id
         test_list: function(callback) {
@@ -39,12 +42,11 @@ exports.subject_detail = function (req, res, next) {
     }, function(err, results) {
         if(err) {
             res.status(500).send({
-                message:
-                err.message || "Cannot get detail of this subject"
+                message: "Cannot get detail of this subject"
             });
             return;
         }
-        res.send({list_test: test_list});
+        res.send({list_test: results.test_list});
 });
     // Subject.find()
     //     .sort([['subject_name', 'ascending']])
@@ -73,8 +75,7 @@ exports.subject_update_post = function (req, res) {
         .exec(function (err, result) {
             if (err) { 
                 res.status(500).send({
-                    message:
-                      err.message || "Cannot update subject."
+                    message: "Cannot update subject."
                 });
                 return;
             }
@@ -104,8 +105,7 @@ exports.subject_delete_post = function(req, res) {
     }, function(err, results) {
         if(err) {
             res.status(500).send({
-                message:
-                err.message || "Cannot delete subject. Subject not found"
+                message: "Cannot delete subject. Subject not found"
             });
             return;
         }
@@ -116,8 +116,7 @@ exports.subject_delete_post = function(req, res) {
                 .exec(function (err) {
                     if (err) { 
                         res.status(500).send({
-                            message:
-                            err.message || "Cannot delete subject. Subject not found"
+                            message: "Cannot delete subject. Subject not found"
                         });
                         return;
                     }
@@ -133,22 +132,21 @@ exports.subject_delete_post = function(req, res) {
 
 exports.subject_create_post = function(req, res) {
     var subject_name = req.body.subject_name;
-    var assigned_teacher = req.body.teacher;
-    var new_subject = new Subject({ subject_name: subject_name, teacher: assigned_teacher});
+    var assigned_teacher = req.body.assigned_teacher;
+    var assigned_class = req.body.assigned_class;
+    var new_subject = new Subject({ subject_name: subject_name, teacher: assigned_teacher, class: assigned_class});
 
     Subject.findOne({'subject_name': subject_name })
         .exec(function(err, found_subject) {
             if(err) {
                 res.status(500).send({
-                    message:
-                    err.message || "Cannot create new subject."
+                    message: "Cannot create new subject."
                 });
                 return;
             }
             if(found_subject) {
                 res.status(400).send({
-                    message:
-                    err.message || 'Subject with name=${subject_name} is already existed.'
+                    message: `Subject with name=${subject_name} is already existed.`
                 });
                 return;
             }
@@ -156,8 +154,7 @@ exports.subject_create_post = function(req, res) {
                 new_subject.save(function(err) {
                     if(err) {
                         res.status(500).send({
-                            message:
-                            err.message || "Cannot create new subject."
+                            message: "Cannot create new subject."
                         });
                         return;
                     }
@@ -175,8 +172,7 @@ exports.subject_archive_post = function(req, res) {
         .exec(function(err, found_one) {
             if(err) {
                 res.status(500).send({
-                    message:
-                    err.message || "Cannot archive this subject."
+                    message: "Cannot archive this subject."
                 });
                 return;
             }
@@ -185,8 +181,7 @@ exports.subject_archive_post = function(req, res) {
         .exec(function(err) {
             if(err) {
                 res.status(500).send({
-                    message:
-                    err.message || "Subject not found."
+                    message: "Subject not found."
                 });
                 return;
             }

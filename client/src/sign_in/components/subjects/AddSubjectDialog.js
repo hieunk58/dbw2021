@@ -6,10 +6,10 @@ import { FormControl, InputLabel, MenuItem,
 import FormDialog from "../../../shared/components/FormDialog";
 import ButtonCircularProgress from "../../../shared/components/ButtonCircularProgress";
 
-const AddUserDialog = withTheme(function (props) {
+const AddSubjectDialog = withTheme(function (props) {
   const { open, onClose, onSuccess, teacherList } = props;
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState("");
+  // const [role, setRole] = useState("");
   const [subjectName, setSubjectName] = useState("");
   const [teacher, setTeacher] = useState("");
   // expected teacherList is a list of {id: teacher_id, name: teacher_name}
@@ -81,13 +81,13 @@ const AddUserDialog = withTheme(function (props) {
   );
 });
 
-AddUserDialog.propTypes = {
+AddSubjectDialog.propTypes = {
   open: PropTypes.bool.isRequired,
-  editMode: PropTypes.bool.isRequired,
+  theme: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
   teacherList: PropTypes.arrayOf(PropTypes.object).isRequired,
   // setTeacherList: PropTypes.func.isRequired,
 };
 
-export default AddUserDialog;
+export default AddSubjectDialog;

@@ -1,13 +1,12 @@
-import React, { useCallback, useState, Fragment } from "react";
+import React, { useCallback, useState, Fragment, forwardRef, useImperativeHandle } from "react";
 import PropTypes from "prop-types";
 
-import { FormControl, InputLabel, MenuItem, 
-    DialogActions, Select, TextField, Button, withTheme } from "@material-ui/core";
+import {  DialogActions, TextField, Button, withTheme } from "@material-ui/core";
 import FormDialog from "../../../shared/components/FormDialog";
 import ButtonCircularProgress from "../../../shared/components/ButtonCircularProgress";
 import DataService from "../../../services/data.service";
 
-const AddUserDialog = withTheme(function (props) {
+const EditUserDialog = withTheme(forwardRef(function (props, ref) {
   const { open, onClose, onSuccess, pushMessageToSnackbar } = props;
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
@@ -15,8 +14,20 @@ const AddUserDialog = withTheme(function (props) {
   const [firstname, setFirstname] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [userId, setUserId] = useState("");
 
-  const handleCreateUser = useCallback(() => {
+  useImperativeHandle(ref, () => ({
+      mapEditData(editData) {
+          setUserId(editData._id);
+          setRole(editData.role._id);
+          setSurname(editData.family_name);
+          setFirstname(editData.first_name);
+          setUsername(editData.username);
+        //   setPassword(editData.password);
+      }
+    }));
+
+  const handleEditUser = useCallback(() => {
     // setLoading(true);
     var data = {
       family_name: surname,
@@ -25,28 +36,24 @@ const AddUserDialog = withTheme(function (props) {
       password: password,
       role: role
     }
-    console.log("create new user: " + data);
-    DataService.createUser(data)
+    console.log("update user: ", JSON.stringify(data));
+    DataService.updateUser(userId, data)
       .then(() => {
         setTimeout(() => {
-          setLoading(false);
-          onClose();
-          pushMessageToSnackbar({
-            text: "New user was created successfully",
-          });
-          onSuccess();
-          setFirstname('');
-          setSurname('');
-          setUsername('');
-          setPassword('');
-          setRole('');
-        }, 1000);
+            setLoading(false);
+            onClose();
+            pushMessageToSnackbar({
+              text: "Update user successfully",
+            });
+            onSuccess();
+            setFirstname('');
+            setSurname('');
+            setUsername('');
+            setPassword('');
+            setRole('');
+          }, 1000);
       })
       .catch(error => {
-        // console.log(error.message);
-        // console.log(error.response.data.message);
-        // console.log(error.response.status);
-        // console.log(error.response.headers);
         setLoading(false);
         pushMessageToSnackbar({
           text: error.response.data.message,
@@ -54,50 +61,22 @@ const AddUserDialog = withTheme(function (props) {
         onClose();
         return;
       })
-  }, [surname, firstname, username, password, role, onSuccess, pushMessageToSnackbar, onClose]);
+  }, [surname, firstname, username, password, role, userId, pushMessageToSnackbar, onClose, onSuccess]);
 
   return (
     <FormDialog
       open={open}
       onClose={onClose}
-      headline= "Add New User"
+      headline= "Edit User"
       hideBackdrop={false}
       loading={loading}
       onFormSubmit={async event => {
         event.preventDefault();
         setLoading(true);
-        handleCreateUser();
+        handleEditUser();
       }}
       content={
         <Fragment>
-            <FormControl fullWidth required>
-                <InputLabel id="role-label">Role</InputLabel>
-                <Select
-                    labelId="role-label"
-                    id="demo-simple-select-required"
-                    value={role}
-                    onChange={event => {
-                        setRole(event.target.value);
-                    }}
-                >
-                    <MenuItem value={"admin"}>Admin</MenuItem>
-                    <MenuItem value={"teacher"}>Teacher</MenuItem>
-                    <MenuItem value={"student"}>Student</MenuItem>
-                </Select>
-            </FormControl>
-
-            <TextField
-                size="small"
-                margin="normal"
-                required
-                fullWidth
-                label="Firstname"
-                variant="outlined"
-                value={firstname}
-                onChange={event => {
-                    setFirstname(event.target.value);
-                }}
-            />
             <TextField
                 size="small"
                 variant="outlined"
@@ -108,6 +87,18 @@ const AddUserDialog = withTheme(function (props) {
                 value={surname}
                 onChange={event => {
                     setSurname(event.target.value);
+                }}
+            />
+            <TextField
+                size="small"
+                margin="normal"
+                required
+                fullWidth
+                label="Firstname"
+                variant="outlined"
+                value={firstname}
+                onChange={event => {
+                    setFirstname(event.target.value);
                 }}
             />
 
@@ -149,20 +140,19 @@ const AddUserDialog = withTheme(function (props) {
           variant="contained"
           disabled={loading}
         >
-          Create {loading && <ButtonCircularProgress />}
+          Save {loading && <ButtonCircularProgress />}
         </Button>
         </DialogActions>
       }
     />
   );
-});
+}));
 
-AddUserDialog.propTypes = {
+EditUserDialog.propTypes = {
   open: PropTypes.bool.isRequired,
-  theme: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
   pushMessageToSnackbar: PropTypes.func.isRequired
 };
 
-export default AddUserDialog;
+export default EditUserDialog;

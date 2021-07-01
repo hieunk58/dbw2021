@@ -7,8 +7,7 @@ var UserSchema = new Schema({
   family_name: { type: String, required: true, maxLength: 100 },
   username: { type: String, unique: true, required: true, maxLength: 20 },
   password: { type: String, required: true, maxLength: 100 },
-  role: { type: Schema.ObjectId, ref: 'Role' },
-  class: { type: Schema.ObjectId, ref: 'Class'} // 1 student belongs to only 1 class
+  role: { type: Schema.ObjectId, ref: 'Role' }
 });
 
 // Virtual for user "full" name.

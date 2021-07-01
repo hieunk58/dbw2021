@@ -2,6 +2,7 @@ var Class = require('../models/class')
 var async = require('async')
 var User = require('../models/user') // user with role="student"
 var Subject = require('../models/subject')
+var Role = require('../models/role')
 
 // const { body,validationResult } = require("express-validator");
 
@@ -19,7 +20,7 @@ exports.class_list = function (req, res, next) {
                 return;
             }
             // Successful
-            res.send({ title: 'Class List', class_list: list_classes });
+            res.send({ class_list: list_classes });
         })
 
 };
@@ -65,7 +66,7 @@ exports.class_update_post = function (req, res) {
 
     var id = req.params.id;
     var new_name = req.body.class_name;
-    Class.findByIdAndUpdate(id, { class_name: new_name} )
+    Class.findByIdAndUpdate(id, { 'class_name': new_name} )
         .exec(function (err, result) {
             if (err) { 
                 res.status(500).send({
@@ -86,16 +87,18 @@ exports.class_update_post = function (req, res) {
 
 exports.class_delete_post = function(req, res) {
     var id = req.params.id;
+    // var role = Role.findOne({ 'name': 'student'} );
+    // console.log("role: ", role);
     async.parallel({
         class: function(callback) {
             Class.findById(id).exec(callback);
         },
         // find all students that have class id = deleted class id
-        student_list: function(callback) {
-            User.find({ 'class': id, 'role': "student" }).exec(callback);
-        },
+        // student_list: function(callback) {
+        //     User.find({ 'class': id, 'role': role});
+        // },
         subject_list: function(callback) {
-            Subject.find({ 'class': id, "isArchived": false})
+            Subject.find({ 'class': id, "isArchived": false}).exec(callback);
         }
         // TODO delete subjects
     }, function(err, results) {
@@ -106,43 +109,41 @@ exports.class_delete_post = function(req, res) {
             });
             return;
         }
+        if(results.subject_list.length > 0) {
+            //delete subject if it is not archived and has no test
+            for(let i = 0; i < results.subject_list.length; ++i) {
+                Test.findOne({'subject': results.subject_list[i]._id})
+                    .exec(function(err, found_one) {
+                        if(err) {
+                            res.status(500).send({
+                                message:
+                                err.message || "Cannot delete class."
+                            });
+                            return;
+                        }
+                        if(!found_one) {
+                            // only delete subject that has no test
+                            Subject.findByIdAndRemove(results.subject_list[i]._id);
+                        }
+                    });
+            }
+
+        }
         // // deassign student from this class, need to do this? or it automatically null
         // for(let i = 0; i < results.student_list.length; ++i) {
         //     results.student_list[i].class = null;
         // }
-        // delete subject if it is not archived and has no test
-        for(let i = 0; i < results.subject_list.length; ++i) {
-            Test.findOne({'subject': results.subject_list[i]._id})
-                .exec(function(err, found_one) {
-                    if(err) {
-                        res.status(500).send({
-                            message:
-                            err.message || "Cannot delete class."
-                        });
-                        return;
-                    }
-                    if(!found_one) {
-                        // only delete subject that has no test
-                        Subject.findByIdAndRemove(results.subject_list[i]._id);
-                    }
-                });
-        }
 
         Class.findByIdAndRemove(id)
-            .exec(function (err, result) {
+            .exec(function (err) {
                 if (err) { 
                     res.status(500).send({
                         message:
                         err.message || "Cannot delete class. Class not found"
                     });
+                    return;
                 }
-                if(!result) {
-                    res.status(404).send({
-                    message: `Cannot delete class with id=${id}`
-                });
-                } else {
-                    res.send({ message: "Class was deleted successfully." });
-                }
+                res.send({ message: "Class was deleted successfully." });
             });
     });
 };
@@ -155,23 +156,20 @@ exports.class_create_post = function(req, res) {
         .exec(function(err, found_class) {
             if(err) {
                 res.status(500).send({
-                    message:
-                    err.message || "Cannot create new class."
+                    message: "Cannot create new class."
                 });
                 return;
             }
             if(found_class) {
                 res.status(400).send({
-                    message:
-                    err.message || 'Class with name=${class_name} is already existed.'
+                    message: `Class with name ${class_name} is already existed.`
                 });
             }
             else {
                 new_class.save(function(err) {
                     if(err) {
                         res.status(500).send({
-                            message:
-                            err.message || "Cannot create new class."
+                            message: "Cannot create new class."
                         });
                     }
                     res.send({ message: "Class was created successfully." });

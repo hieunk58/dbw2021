@@ -1,173 +1,141 @@
-import React, { memo, useCallback, useState, useEffect, Fragment } from "react";
-import PropTypes from "prop-types";
-import classNames from "classnames";
-import { withStyles } from "@material-ui/core";
-import Routing from "./Routing";
-import NavBar from "./navigation/NavBar";
-// import ConsecutiveSnackbarMessages from "../../shared/components/ConsecutiveSnackbarMessages";
-// import smoothScrollTop from "../../shared/functions/smoothScrollTop";
-// import persons from "../dummy_data/persons";
-// import LazyLoadAddBalanceDialog from "./subscription/LazyLoadAddBalanceDialog";
+  import React, { memo, useCallback, useState, useEffect, Fragment } from "react";
+  import PropTypes from "prop-types";
+  import classNames from "classnames";
+  import { withStyles } from "@material-ui/core";
+  import Routing from "./Routing";
+  import NavBar from "./navigation/NavBar";
+  import ConsecutiveSnackbarMessages from "../../shared/components/ConsecutiveSnackbarMessages";
+  import DataService from "../../services/data.service";
+  import AuthService from "../../services/auth.service";
 
-const styles = (theme) => ({
-  main: {
-    marginLeft: theme.spacing(9),
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    [theme.breakpoints.down("xs")]: {
-      marginLeft: 0,
+  const styles = (theme) => ({
+    main: {
+      marginLeft: theme.spacing(9),
+      transition: theme.transitions.create(["width", "margin"], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      [theme.breakpoints.down("xs")]: {
+        marginLeft: 0,
+      },
     },
-  },
-});
-// dummy data
-const persons = [
-  {
-    src: `${process.env.PUBLIC_URL}/images/sign_in/image1.jpg`,
-    name: "Markus",
-  },
-  {
-    src: `${process.env.PUBLIC_URL}/images/sign_in/image2.jpg`,
-    name: "David",
-  },
-  {
-    src: `${process.env.PUBLIC_URL}/images/sign_in/image3.jpg`,
-    name: "Arold",
-  },
-  {
-    src: `${process.env.PUBLIC_URL}/images/sign_in/image4.jpg`,
-    name: "Joanic",
-  },
-  {
-    src: `${process.env.PUBLIC_URL}/images/sign_in/image5.jpg`,
-    name: "Sophia",
-  },
-  {
-    src: `${process.env.PUBLIC_URL}/images/sign_in/image6.jpg`,
-    name: "Aaron",
-  },
-  {
-    src: `${process.env.PUBLIC_URL}/images/sign_in/image7.jpg`,
-    name: "Steven",
-  },
-  {
-    src: `${process.env.PUBLIC_URL}/images/sign_in/image8.jpg`,
-    name: "Felix",
-  },
-  {
-    src: `${process.env.PUBLIC_URL}/images/sign_in/image9.jpg`,
-    name: "Vivien",
-  },
-  {
-    src: `${process.env.PUBLIC_URL}/images/sign_in/image10.jpg`,
-    name: "Leonie",
-  },
-];
-
-// dummy classes
-const dummy_classes = [
-  {id: 0, name: "Master of Automotive Software Engineering"},
-  {id: 1, name: "Master of Informatic"},
-  {id: 2, name: "Master of Biomedicine Technique"},
-];
-
-//TODO get all user has role=student, subjects
-// then fill each class based on classID
-
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
+  });
 
 function Main(props) {
-  const { classes } = props;
-  const [selectedTab, setSelectedTab] = useState(null);
-  const [targets, setTargets] = useState([]);
-  const [classList, setClassList] = useState([]);
-  const [subjectList, setSubjectList] = useState([]);
-  const [teacherList, setTeacherList] = useState([]);
-  const [studentList, setStudentList] = useState([]);
-  const [pushMessageToSnackbar, setPushMessageToSnackbar] = useState(null);
+    const { classes } = props;
+    const [selectedTab, setSelectedTab] = useState(null);
+    const [targets, setTargets] = useState([]);
+    const [classList, setClassList] = useState([]);
+    const [subjectList, setSubjectList] = useState([]);
+    const [subjectListByTeacher, setSubjectListByTeacher] = useState([]);
+    const [teacherList, setTeacherList] = useState([]);
+    const [studentList, setStudentList] = useState([]);
+    const [currentUser, setCurrentUser] = useState(undefined);
 
-  // TODO: fetch user list from api
-  const fetchRandomTargets = useCallback(() => {
-    const targets = [];
-    // take teacher from user list
-    const teacherList = [];
-    
+    //const [currentUserId, setCurrentUserId] = useState("60d782d7dd186a3be49bee16"); // fake current sign in user
+    const [pushMessageToSnackbar, setPushMessageToSnackbar] = useState(null);
+
+    // fetch user list from api
+    const fetchTeacherList = useCallback(() => {
+      console.log("[Main.js] get user list using api");
+      DataService.getUserList()
+        .then(res => {
+          console.log("[Main.js] get user list using api: ", res.data);
+          setTargets(res.data.user_list);
+
+          var list = res.data.user_list;
+          var teachers = [];
+          for(let i = 0; i < list.length; ++i) {
+            if(list[i].role.name === "teacher") {
+              console.log("teacher: ", list[i].username);
+              console.log("role: ", list[i].role.name);
+              teachers.push(list[i]);
+            }
+          }
+          setTeacherList(teachers);
+          // console.log("teacher list count: ", teacherList.length);
+          console.log("teacher list count: ", teachers.length);
+          // console.log("user list count: ", targets.length);
+        });
+    }, [setTeacherList]);
+    const fetchRandomUsers = useCallback(() => {
+      console.log("[Main.js] get user list using api");
+      DataService.getUserList()
+        .then(res => {
+          console.log("[Main.js] get user list using api: ", res.data);
+          setTargets(res.data.user_list);
+
+          var list = res.data.user_list;
+          var teachers = [];
+          for(let i = 0; i < list.length; ++i) {
+            if(list[i].role.name === "teacher") {
+              console.log("teacher: ", list[i].username);
+              console.log("role: ", list[i].role.name);
+              teachers.push(list[i]);
+            }
+          }
+          // setTeacherList(teachers);
+          // setTeacherList(list);
+          console.log("teacher list count: ", teacherList.length);
+          console.log("teacher list count: ", teachers.length);
+          console.log("user list count: ", targets.length);
+        });
+    }, [setTargets, setTeacherList]);
+
+  // dummy data
+  const fetchRandomStudents = useCallback(() => {
+    const students = [];
     //TODO check person is empty or not before access data
     for (let i = 0; i < 20; i += 1) {
-      const randomPerson = persons[Math.floor(Math.random() * persons.length)];
-      const target = {
+      const student = {
         id: i,
-        number1: Math.floor(Math.random() * 251),
-        number2: Math.floor(Math.random() * 251),
-        number3: Math.floor(Math.random() * 251),
-        number4: Math.floor(Math.random() * 251),
-        name: randomPerson.name,
-        profilePicUrl: randomPerson.src,
+        name: "Daniel Richter",
+        username: "dr2021"
       };
-      targets.push(target);
-
-      const teacher = {
-        id: i, // TODO id should be id from Db
-        name: randomPerson.name
-      };
-      teacherList.push(teacher);
+      students.push(student);
     }
-    setTargets(targets);
-    setTeacherList(teacherList);
-  }, [setTargets, setTeacherList]);
+    setStudentList(students);
 
- // dummy data
- const fetchRandomStudents = useCallback(() => {
-  const students = [];
-  //TODO check person is empty or not before access data
-  for (let i = 0; i < 20; i += 1) {
-    const student = {
-      id: i,
-      name: "Daniel Richter",
-      username: "dr2021"
-    };
-    students.push(student);
-  }
-  setStudentList(students);
+  }, [setStudentList]);
 
-}, [setStudentList]);
+  const fetchRandomSubjects = useCallback((currentUser) => {
+    DataService.getSubjectList()
+      .then(res => {
+        console.log("get subject by user: ", currentUser);
+        const list = res.data.subject_list;
+        console.log("list: ", list);
+        // console.log("[Main.js] get subject list using api: ", res.data);
+        setSubjectList(subjectList);
+        // filter subject by current signed in teacher
+        // for student just filter with class id
+        var subjects = [];
+        for(let i = 0; i < list.length; ++i) {
+          if(list[i].teacher._id === currentUser.id) {
+            subjects.push(list[i]);
+          }
+        }
+        setSubjectListByTeacher(subjects);
+        console.log("subject list by teacher: ", subjectListByTeacher);
+        // setSubjectList(subjects);
+      });
 
-  const fetchRandomSubjects = useCallback(() => {
-    const targets = [];
-    //TODO check person is empty or not before access data
-    for (let i = 0; i < 20; i += 1) {
-      const target = {
-        id: i,
-        name: "Datenbanken und Webtechnik sommer semester 2021",
-        instructor: "Andre Windisch",
-      };
-      targets.push(target);
-    }
-    setSubjectList(targets);
+  }, []);
 
-  }, [setSubjectList]);
+  // const fetchSubjectByUser = useCallback(() => {
+  //   DataService.getSubjectList()
+  //     .then(res => {
+  //       console.log("[Main.js] get subject list using api: ", res.data);
+  //       setSubjectListByTeacher(res.data.subject_list);
+  //     });
+
+  // }, [setSubjectList]);
 
   const fetchRandomClasses = useCallback(() => {
-    // const targets = [];
-    // //TODO check person is empty or not before access data
-    // for (let i = 0; i < 20; i += 1) {
-    //   const randomPerson = persons[Math.floor(Math.random() * persons.length)];
-    //   const target = {
-    //     id: i,
-    //     // calculate the number of students and subjects in each class
-    //     number1: 3,
-    //     number2: 2,
-    //     name: randomPerson.name,
-    //   };
-      // targets.push(target);
-    // }
-    setClassList(dummy_classes);
+    DataService.getClassList()
+      .then(res => {
+        console.log("[Main.js] get class list using api: ", res.data);
+        setClassList(res.data.class_list);
+      });
 
   }, [setClassList]);
 
@@ -193,45 +161,94 @@ function Main(props) {
     setSelectedTab,
   ]);
 
+  const getPushMessageFromChild = useCallback(
+    (pushMessage) => {
+      setPushMessageToSnackbar(() => pushMessage);
+    },
+    [setPushMessageToSnackbar]
+  );
+
+  // const [showAdminPage, setShowAdminPage] = useState(false);
+  // const [showTeacherPage, setShowTeacherPage] = useState(false);
+  const getCurrentUser = useCallback(() => {
+    const user = AuthService.getCurrentUser();
+    console.log("getCurrentUser: ", user);
+    // fetchRandomStudents();
+    fetchRandomSubjects(user);
+    if (user) {
+      setCurrentUser(user);
+      // console.log("current user: ", user);
+      // setShowAdminPage(user.role.name === "admin");
+      // setShowTeacherPage(user.role.name === "teacher");
+    }
+  }, []);
+
+  
   useEffect(() => {
+    console.log("first get current user");
+    getCurrentUser();
+  }, [getCurrentUser]);
+
+  useEffect(() => {
+    console.log("fetching some data");
+    // getCurrentUser();
     // user list
-    fetchRandomTargets();
+    // fetchRandomSubjects(currentUser);
+    fetchRandomUsers();
+    fetchTeacherList();
     fetchRandomClasses();
-    fetchRandomSubjects();
     fetchRandomStudents();
 
-  }, [fetchRandomTargets, fetchRandomClasses, fetchRandomSubjects, fetchRandomStudents]);
+  }, [fetchRandomUsers, fetchRandomClasses, fetchRandomStudents, fetchTeacherList]);
 
-  return (
-    <Fragment>
-      <NavBar
-        selectedTab={selectedTab}
-      />
-      <main className={classNames(classes.main)}>
-        <Routing
-          selectDashboard={selectDashboard}
-          selectClass={selectClass}
-          selectSubject={selectSubject}
-          // targets is user list
-          targets={targets}
-          setTargets={setTargets}
-          classList={classList}
-          setClassList={setClassList}
-          subjectList={subjectList}
-          setSubjectList={setSubjectList}
-          teacherList={teacherList}
-          setTeacherList={setTeacherList}
-          studentList={studentList}
-          setStudentList={setStudentList}
-          pushMessageToSnackbar={pushMessageToSnackbar}
+    return (
+      <Fragment>
+        <NavBar
+          currentUser={currentUser}
+          selectedTab={selectedTab}
         />
-      </main>
-    </Fragment>
-  );
-}
+        <ConsecutiveSnackbarMessages
+          getPushMessageFromChild={getPushMessageFromChild}
+        />
+        <main className={classNames(classes.main)}>
+          <Routing
+            selectDashboard={selectDashboard}
+            selectClass={selectClass}
+            selectSubject={selectSubject}
+            currentUser={currentUser}
 
-Main.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
 
-export default withStyles(styles, { withTheme: true })(memo(Main));
+            // targets is user list
+            targets={targets}
+            setTargets={setTargets}
+
+            classList={classList}
+            // setClassList={setClassList}
+
+            subjectList={subjectList}
+            // setSubjectList={setSubjectList}
+
+            teacherList={teacherList}
+            // teacherList={targets}
+            // setTeacherList={setTargets}
+            // setTeacherList={setTeacherList}
+
+            studentList={studentList}
+            setStudentList={setStudentList}
+
+            subjectListByTeacher={subjectListByTeacher}
+            // setSubjectListByTeacher={setSubjectListByTeacher}
+
+            pushMessageToSnackbar={pushMessageToSnackbar}
+
+          />
+        </main>
+      </Fragment>
+    );
+  }
+
+  Main.propTypes = {
+    classes: PropTypes.object.isRequired,
+  };
+
+  export default withStyles(styles, { withTheme: true })(memo(Main));

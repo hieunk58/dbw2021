@@ -18,6 +18,8 @@ router.post('/user/create', user_controller.user_create_post);
 router.post('/user/:id/update', user_controller.user_update_post);
 // POST delete user
 router.post('/user/:id/delete', user_controller.user_delete_post);
+// GET user detail
+router.get('/user/:id', user_controller.user_detail);
 /// END USER ROUTES ///
 
 /// CLASS ROUTES ///
@@ -28,7 +30,7 @@ router.post('/class/create', class_controller.class_create_post);
 // POST update class name
 router.post('/class/:id/update', class_controller.class_update_post);
 // POST delete class
-router.post('/class/:id/delete', class_controller.class_update_post);
+router.post('/class/:id/delete', class_controller.class_delete_post);
 // GET class detail
 router.get('/class/:id', class_controller.class_detail);
 /// END CLASS ROUTES ///

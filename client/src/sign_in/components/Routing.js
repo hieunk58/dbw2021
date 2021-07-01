@@ -5,7 +5,8 @@ import { withStyles } from "@material-ui/core";
 import Dashboard from "./dashboard/Dashboard";
 import Classes from "./classes/Classes";
 import Subjects from "./subjects/Subjects";
-import StudentPage from "./student/StudentPage"
+import StudentPage from "./student/StudentPage";
+import TeacherPage from "./teacher/TeacherPage";
 import PropsRoute from "../../shared/components/PropsRoute";
 
 const styles = (theme) => ({
@@ -58,6 +59,9 @@ function Routing(props) {
     selectSubject,
     teacherList,
     setTeacherList,
+    currentUser,
+    subjectListByTeacher,
+    setSubjectListByTeacher,
     studentList,
     setStudentList
     // openAddBalanceDialog,
@@ -72,11 +76,12 @@ function Routing(props) {
           pushMessageToSnackbar={pushMessageToSnackbar}
           selectClass={selectClass}
           classList={classList}
-          setClassList={setClassList}
+          teacherList={teacherList}
+          // setClassList={setClassList}
           subjectList={subjectList}
-          setSubjectList={setSubjectList}
-          studentList={studentList} // get all user then filter by role=student
-          setStudentList={setStudentList}
+          // setSubjectList={setSubjectList}
+          // studentList={studentList} // get all user then filter by role=student
+          // setStudentList={setStudentList}
         />
         <PropsRoute
           path="/c/subjects"
@@ -85,33 +90,35 @@ function Routing(props) {
           selectSubject={selectSubject}
           // subjectList={subjectList}
           // setSubjectList={setSubjectList}
-          teacherList={teacherList}
-          setTeacherList={setTeacherList}
+          // teacherList={teacherList}
+          // setTeacherList={setTeacherList}
         />
         <PropsRoute
-          // path="/c/users"
-          path=""
+          path="/c/users"
           component={Dashboard}
           pushMessageToSnackbar={pushMessageToSnackbar}
           targets={targets}
           setTargets={setTargets}
           selectDashboard={selectDashboard}
         />
-        {/* <PropsRoute
+        <PropsRoute
           // student view
           // path="/profile/student"
-          path="/c/users"
+          path="/c/student"
           component={StudentPage}
-        /> */}
-        {/* <PropsRoute
+        />
+        <PropsRoute
           // teacher view
-          path="/profile/teacher"
-          component={Dashboard}
+          path="/c/teacher"
+          component={TeacherPage}
+          currentUser={currentUser}
           pushMessageToSnackbar={pushMessageToSnackbar}
-          targets={targets}
-          setTargets={setTargets}
-          selectDashboard={selectDashboard}
-        /> */}
+          subjectListByTeacher={subjectListByTeacher}
+          // setSubjectListByTeacher={setSubjectListByTeacher}
+          // targets={targets}
+          // setTargets={setTargets}
+          // selectDashboard={selectDashboard}
+        />
       </Switch>
     </div>
   );
@@ -120,6 +127,7 @@ function Routing(props) {
 Routing.propTypes = {
   classes: PropTypes.object.isRequired,
   pushMessageToSnackbar: PropTypes.func,
+  targets: PropTypes.arrayOf(PropTypes.object).isRequired,
   setTargets: PropTypes.func.isRequired,
   subjectList: PropTypes.arrayOf(PropTypes.object).isRequired,
   teacherList: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -127,7 +135,6 @@ Routing.propTypes = {
   setSubjectList: PropTypes.func.isRequired,
   classList: PropTypes.arrayOf(PropTypes.object).isRequired,
   setClassList: PropTypes.func.isRequired,
-  targets: PropTypes.arrayOf(PropTypes.object).isRequired,
   selectDashboard: PropTypes.func.isRequired,
   selectClass: PropTypes.func.isRequired,
   selectSubject: PropTypes.func.isRequired,

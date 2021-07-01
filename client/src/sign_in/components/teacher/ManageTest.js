@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import PropTypes from "prop-types";
 import {
   Table,
@@ -16,16 +16,18 @@ import {
   withStyles,
 } from "@material-ui/core";
 
-import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
-import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import EditIcon from "@material-ui/icons/Edit";
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import EnhancedTableHead from "../../../shared/components/EnhancedTableHead";
 import stableSort from "../../../shared/functions/stableSort";
 import getSorting from "../../../shared/functions/getSorting";
 import HighlightedInformation from "../../../shared/components/HighlightedInformation";
 import ConfirmationDialog from "../../../shared/components/ConfirmationDialog";
-import AddSubjectDialog from "./AddSubjectDialog";
+import AddTestDialog from "./AddTestDialog";
+import EditTestDialog from "./EditTestDialog";
+// import AddSubjectDialog from "./AddSubjectDialog";
+import DataService from "../../../services/data.service";
 
 const styles = (theme) => ({
   tableWrapper: {
@@ -46,8 +48,12 @@ const styles = (theme) => ({
   confirmDialog: {
     color: theme.palette.common.pink,
   },
+  avatar: {
+    width: 28,
+    height: 28,
+  },
   firstData: {
-    paddingLeft: theme.spacing(2),
+    paddingLeft: theme.spacing(3),
   },
   iconButton: {
     padding: theme.spacing(1),
@@ -63,34 +69,31 @@ const styles = (theme) => ({
 const rows = [
   { id: "icon", numeric: true, label: "", },
   { id: "name", numeric: false, label: "Name", },
-  { id: "instructor", numeric: false, label: "Instructor" },
+  { id: "date", numeric: false, label: "Date", },
   { id: "actions", numeric: false, label: "", },
 ];
 
 const rowsPerPage = 25;
 
-function CustomTable(props) {
-  const { pushMessageToSnackbar, classes, teacherList, 
-    selectSubject } = props;
+function ManageTest(props) {
+  const editForm = useRef();
+
+  const { pushMessageToSnackbar, classes, onClose, open, teacherList, currentClass, currentSubject } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
-  const [subjectList, setSubjectList] = useState([]);
+  const [testList, setTestList] = useState([]);
+
   const [isDeleteTargetDialogOpen, setIsDeleteTargetDialogOpen] = useState(
     false
   );
   const [deleteTargetDialogRow, setDeleteTargetDialogRow] = useState(null);
   const [isDeleteTargetLoading, setIsDeleteTargetLoading] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  const [open, setOpen] = useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+  // const [open, setOpen] = useState(false);
+  // const fetchTestListBySubject
 
   const handleRequestSort = useCallback(
     (__, property) => {
@@ -104,29 +107,56 @@ function CustomTable(props) {
     },
     [setOrder, setOrderBy, order, orderBy]
   );
+  const fetchTestListBySubject = useCallback(() => {
+    // get test list by subject id
+    console.log(" fetchTestListBySubject id: ", currentSubject);
+    DataService.getSubjectDetail(currentSubject._id)
+    .then((res) => {
+      // console.log("test list by subject: ", res.data);
+      setTestList(res.data.list_test);
+    })
+    .catch((error) => {
+      console.log("error: ", error.response.data.message);
+      pushMessageToSnackbar({
+        text: error.response.data.message,
+      });
+    })
+
+  }, [currentSubject, pushMessageToSnackbar]);
 
   const deleteTarget = useCallback(() => {
     setIsDeleteTargetLoading(true);
-    setTimeout(() => {
-      setIsDeleteTargetDialogOpen(false);
-      setIsDeleteTargetLoading(false);
-      const _subjectList = [...subjectList];
-      const index = _subjectList.findIndex(
-        (element) => element.id === deleteTargetDialogRow.id
-      );
-      _subjectList.splice(index, 1);
-      setSubjectList(_subjectList);
-      pushMessageToSnackbar({
-        text: "Subject has been removed",
+    DataService.deleteTest(deleteTargetDialogRow._id)
+      .then(() => {
+        setTimeout(() => {
+          setIsDeleteTargetDialogOpen(false);
+          setIsDeleteTargetLoading(false);
+          const _testList = [...testList];
+          const index = _testList.findIndex(
+            (element) => element.id === deleteTargetDialogRow.id
+          );
+          _testList.splice(index, 1);
+          setTestList(_testList);
+          pushMessageToSnackbar({
+            text: "Test has been removed",
+          });
+          // todo fetch test list after remove
+          fetchTestListBySubject();
+        }, 1500);
+      })
+      .catch(error => {
+        pushMessageToSnackbar({
+          text: error.response.data.message,
+        });
       });
-    }, 1500);
   }, [
     setIsDeleteTargetDialogOpen,
     setIsDeleteTargetLoading,
     pushMessageToSnackbar,
-    setSubjectList,
+    // setTestList,
+    fetchTestListBySubject,
     deleteTargetDialogRow,
-    subjectList,
+    testList,
   ]);
 
   const handleChangePage = useCallback(
@@ -139,6 +169,12 @@ function CustomTable(props) {
   const handleDeleteTargetDialogClose = useCallback(() => {
     setIsDeleteTargetDialogOpen(false);
   }, [setIsDeleteTargetDialogOpen]);
+  const handleAddDialogClose = useCallback(() => {
+    setIsAddDialogOpen(false);
+  }, [setIsAddDialogOpen]);
+  const handleAddDialogOpen = useCallback(() => {
+    setIsAddDialogOpen(true);
+  }, [setIsAddDialogOpen]);
 
   const handleDeleteTargetDialogOpen = useCallback(
     (row) => {
@@ -148,29 +184,96 @@ function CustomTable(props) {
     [setIsDeleteTargetDialogOpen, setDeleteTargetDialogRow]
   );
 
-  useEffect(selectSubject, [selectSubject]);
+  const handleEditDialogClose = useCallback(() => {
+    setIsEditDialogOpen(false);
+  }, [setIsEditDialogOpen]);
+
+  const handleEditDialogOpen = useCallback(
+    (row) => {
+      // fetchTestListBySubject()
+      console.log("edit data: ", row);
+      editForm.current.mapEditData(row);
+      // editForm.current.mapEditData(row);
+      setIsEditDialogOpen(true);
+    },
+    [setIsEditDialogOpen]
+  );
+
+  const handleCreateTestSuccess = useCallback(() => {
+    fetchTestListBySubject();
+
+  }, [fetchTestListBySubject]);
+  
+  function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [day, month, year].join('.');
+}
+
+
+  useEffect(() => {
+    // if(open === true) {
+      console.log('open is true, get test list');
+      fetchTestListBySubject();
+    // }
+  }, [fetchTestListBySubject, open]);
 
   return (
     <Paper>
       <Toolbar className={classes.toolbar}>
-        <Typography variant="h6">Subject List</Typography>
+        <Typography variant="h6">Test List</Typography>
+        <Box mr={1}>
+            <Button onClick={onClose}>
+            Back
+            </Button>
+        </Box>
+        {/* <Button 
+          variant="contained"
+          color="primary"
+          onClick={onClose}
+          disableElevation
+        >
+          Back
+        </Button> */}
         <Button
           variant="contained"
           color="secondary"
-          onClick={handleClickOpen}
-          startIcon={<AddIcon/>}
+          onClick={handleAddDialogOpen}
           disableElevation
         >
-          Add Subject
+          Add New Test
         </Button>
       </Toolbar>
       
-      <AddSubjectDialog 
-        open={open}
-        onClose={handleClose}
-        teacherList={teacherList}
+      <AddTestDialog 
+        open={isAddDialogOpen}
+        onClose={handleAddDialogClose}
+        // testList={testList}
+        // teacherList={teacherList}
+        // currentClass={currentClass}
+        currentSubject={currentSubject}
+        onSuccess={handleCreateTestSuccess}
+        pushMessageToSnackbar={pushMessageToSnackbar}
       >
-      </AddSubjectDialog>
+      </AddTestDialog>
+
+      <EditTestDialog
+        ref={editForm}
+        open={isEditDialogOpen}
+        onSuccess={handleCreateTestSuccess}
+        onClose={handleEditDialogClose}
+        pushMessageToSnackbar={pushMessageToSnackbar}
+      >
+      </EditTestDialog>
+
       <Divider />
       <ConfirmationDialog
         open={isDeleteTargetDialogOpen}
@@ -179,9 +282,9 @@ function CustomTable(props) {
         content={
           deleteTargetDialogRow ? (
             <span>
-              {"Do you really want to remove this subject "}
-              <b>{deleteTargetDialogRow.name}</b>
-              {" from your list?"}
+              {"Do you really want to remove this test "}
+              <b>{deleteTargetDialogRow.test_name}</b>
+              {" from the class?"}
             </span>
           ) : null
         }
@@ -191,17 +294,17 @@ function CustomTable(props) {
       />
       <Box width="100%">
         <div className={classes.tableWrapper}>
-          {subjectList.length > 0 ? (
+          {testList.length > 0 ? (
             <Table aria-labelledby="tableTitle">
               <EnhancedTableHead
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
-                rowCount={subjectList.length}
+                rowCount={testList.length}
                 rows={rows}
               />
               <TableBody>
-                {stableSort(subjectList, getSorting(order, orderBy))
+                {stableSort(testList, getSorting(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => (
                     <TableRow hover tabIndex={-1} key={index}>
@@ -210,19 +313,26 @@ function CustomTable(props) {
                         scope="row"
                         className={classes.firstData}
                       >
-                        <LibraryBooksIcon className={classes.blackIcon}/>
+                        <IconButton
+                          className="classes.iconButton"
+                        >
+                          <CalendarTodayIcon className={classes.blackIcon} />
+                        </IconButton>
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.name}
+                        {row.test_name}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.instructor}
+                        {formatDate(row.test_date)}
                       </TableCell>
+                      
                       <TableCell component="th" scope="row">
                         <Box display="flex" justifyContent="flex-end">
                           <IconButton
                             className={classes.iconButton}
-                            // TODO onClick={}
+                            onClick={() => {
+                              handleEditDialogOpen(row);
+                            }}
                             aria-label="Edit"
                           >
                             <EditIcon className={classes.blackIcon} />
@@ -238,6 +348,7 @@ function CustomTable(props) {
                           </IconButton>
                         </Box>
                       </TableCell>
+                      
                     </TableRow>
                   ))}
               </TableBody>
@@ -245,7 +356,7 @@ function CustomTable(props) {
           ) : (
             <Box m={2}>
               <HighlightedInformation>
-                No subject yet.
+                There is not any tests yet.
               </HighlightedInformation>
             </Box>
           )}
@@ -253,7 +364,7 @@ function CustomTable(props) {
         <div className={classes.alignRight}>
           <TablePagination
             component="div"
-            count={subjectList.length}
+            count={testList.length}
             rowsPerPage={rowsPerPage}
             page={page}
             backIconButtonProps={{
@@ -266,8 +377,8 @@ function CustomTable(props) {
             classes={{
               select: classes.dNone,
               selectIcon: classes.dNone,
-              actions: subjectList.length > 0 ? classes.dBlock : classes.dNone,
-              caption: subjectList.length > 0 ? classes.dBlock : classes.dNone,
+              actions: testList.length > 0 ? classes.dBlock : classes.dNone,
+              caption: testList.length > 0 ? classes.dBlock : classes.dNone,
             }}
             labelRowsPerPage=""
           />
@@ -277,15 +388,15 @@ function CustomTable(props) {
   );
 }
 
-CustomTable.propTypes = {
+ManageTest.propTypes = {
   classes: PropTypes.object.isRequired,
-  subjectList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  setSubjectList: PropTypes.func.isRequired,
+  currentSubject: PropTypes.object.isRequired,
+  pushMessageToSnackbar: PropTypes.func.isRequired,
+  onClose: PropTypes.func,
+  testList: PropTypes.arrayOf(PropTypes.object).isRequired,
   teacherList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  setTeacherList: PropTypes.func.isRequired,
-  pushMessageToSnackbar: PropTypes.func,
-  openAddUserDialog: PropTypes.func.isRequired,
-  selectSubject: PropTypes.func.isRequired
+  setTestList: PropTypes.func.isRequired,
+  setTeacherList: PropTypes.func.isRequired
 };
 
-export default withStyles(styles, { withTheme: true })(CustomTable);
+export default withStyles(styles, { withTheme: true })(ManageTest);

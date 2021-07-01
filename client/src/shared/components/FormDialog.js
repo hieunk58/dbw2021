@@ -7,7 +7,7 @@ const styles = theme => ({
   dialogPaper: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
+    alignItems: "left",
     paddingBottom: theme.spacing(3),
     maxWidth: 420
   },

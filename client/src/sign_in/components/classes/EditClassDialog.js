@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useState } from "react";
+import React, { Fragment, useCallback, useState, forwardRef, useImperativeHandle } from "react";
 import PropTypes from "prop-types";
 
 import DataService from "../../../services/data.service";
@@ -7,55 +7,58 @@ import { DialogActions, TextField, Button, withTheme } from "@material-ui/core";
 import FormDialog from "../../../shared/components/FormDialog";
 import ButtonCircularProgress from "../../../shared/components/ButtonCircularProgress";
 
-const AddClassDialog = withTheme(function (props) {
+const EditClassDialog = withTheme(forwardRef(function (props, ref) {
   const { open, onClose, onSuccess, pushMessageToSnackbar } = props;
   const [loading, setLoading] = useState(false);
   const [className, setClassname] = useState("");
+  const [classId, setClassId] = useState("");
 
-  const handleCreateClass = useCallback(() => {
-    // setLoading(true);
+  useImperativeHandle(ref, () => ({
+    mapEditData(editData) {
+        setClassId(editData._id);
+        setClassname(editData.class_name);
+    }
+  }));
+
+  const handleEditClass = useCallback(() => {
     var data = {
       class_name: className
     }
-    console.log("create new class: " + className);
-    DataService.createClass(data)
+    console.log("new class name: " + className);
+    DataService.updateClass(classId, data)
       .then(() => {
         setTimeout(() => {
-          setLoading(false);
-          pushMessageToSnackbar({
-            text: "New class was created successfully",
-          });
-          onSuccess();
-          onClose();
-          setClassname('');
-        }, 1000);
+            setLoading(false);
+            pushMessageToSnackbar({
+                text: "Update class successfully",
+            });
+            onSuccess();
+            onClose();
+            setClassname('');
+          }, 1000);
       })
       .catch(error => {
-        // console.log(error.message);
-        // console.log(error.response.data.message);
-        // console.log(error.response.status);
-        // console.log(error.response.headers);
         setLoading(false);
         pushMessageToSnackbar({
-          text: error.response.data.message,
+          text: "Update class failed",
         });
         onClose();
         setClassname('');
         return;
       })
-  }, [className, onSuccess, pushMessageToSnackbar, onClose]);
+  }, [className, classId, onSuccess, pushMessageToSnackbar, onClose]);
 
   return (
     <FormDialog
       open={open}
       onClose={onClose}
-      headline= "Add New Class"
+      headline= "Edit Class"
       hideBackdrop={false}
       loading={loading}
       onFormSubmit={async event => {
         event.preventDefault();
         setLoading(true);
-        handleCreateClass();
+        handleEditClass();
         // onSuccess();
       }}
       content={
@@ -66,8 +69,8 @@ const AddClassDialog = withTheme(function (props) {
                 margin="normal"
                 required
                 fullWidth
-                label="Class name"
                 autoFocus
+                label="Class name"
                 value={className}
                 onChange={event => {
                     setClassname(event.target.value);
@@ -79,24 +82,23 @@ const AddClassDialog = withTheme(function (props) {
         <DialogActions>
           <Button onClick={onClose} disabled={loading}>
           Close
-          </Button>
-          <Button
-            color="secondary"
-            // onClick={onSuccess}
-            // onClick={handleCreateClass}
-            type="submit"
-            variant="contained"
-            disabled={loading}
-          >
-            Create {loading && <ButtonCircularProgress />}
-          </Button>
+        </Button>
+        <Button
+          color="secondary"
+          // onClick={onSuccess}
+          type="submit"
+          variant="contained"
+          disabled={loading}
+        >
+          Save {loading && <ButtonCircularProgress />}
+        </Button>
         </DialogActions>
       }
     />
   );
-});
+}));
 
-AddClassDialog.propTypes = {
+EditClassDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
@@ -104,4 +106,4 @@ AddClassDialog.propTypes = {
 
 };
 
-export default AddClassDialog;
+export default EditClassDialog;

@@ -6,7 +6,7 @@ import ModalBackdrop from "../../../shared/components/ModalBackdrop";
 function DialogSelector(props) {
   const {
     dialogOpen,
-    openLoginDialog,
+    // openLoginDialog,
     onClose,
   } = props;
   const [loginStatus, setLoginStatus] = useState(null);

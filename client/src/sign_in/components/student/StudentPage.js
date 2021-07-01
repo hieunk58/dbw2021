@@ -57,18 +57,19 @@ const styles = (theme) => ({
 
 const rows = [
   { id: "icon", numeric: true, label: "", },
-  { id: "name", numeric: false, label: "Name", },
-  { id: "grade", numeric: false, label: "Grade" },
+  { id: "name", numeric: false, label: "Subject Name", },
+  { id: "grade", numeric: true, label: "Average Grade" },
   { id: "actions", numeric: false, label: "", },
 ];
 
 const rowsPerPage = 25;
 
 function CustomTable(props) {
-  const { classes, subjectList, setSubjectList } = props;
+  const { classes } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
+  const [subjectList, setSubjectList] = useState([]);
 
   const [open, setOpen] = useState(false);
 

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import PropTypes from "prop-types";
 import {
   Table,
@@ -26,6 +26,8 @@ import getSorting from "../../../shared/functions/getSorting";
 import HighlightedInformation from "../../../shared/components/HighlightedInformation";
 import ConfirmationDialog from "../../../shared/components/ConfirmationDialog";
 import AddUserDialog from "./AddUserDialog";
+import EditUserDialog from "./EditUserDialog";
+import DataService from "../../../services/data.service";
 
 const styles = (theme) => ({
   tableWrapper: {
@@ -75,14 +77,8 @@ const rows = [
     numeric: false,
     label: "Name",
   },
-  { id: "number1", numeric: false, label: "Category 1" },
-  { id: "number2", numeric: false, label: "Category 2" },
-  { id: "number3", numeric: false, label: "Category 3" },
-  {
-    id: "number4",
-    numeric: false,
-    label: "Category 4",
-  },
+  { id: "username", numeric: false, label: "Username" },
+  { id: "role", numeric: false, label: "Role" },
   {
     id: "actions",
     numeric: false,
@@ -93,25 +89,38 @@ const rows = [
 const rowsPerPage = 25;
 
 function CustomTable(props) {
-  const { pushMessageToSnackbar, classes, targets, setTargets, openAddUserDialog } = props;
+  const editForm = useRef();
+
+  const { pushMessageToSnackbar, classes, targets, setTargets } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
   const [isDeleteTargetDialogOpen, setIsDeleteTargetDialogOpen] = useState(
     false
   );
+  const [isEditDialogOpen, setIsEditUserDialogOpen] = useState(false);
+  const [editUserDialogRow, setEditUserDialogRow] = useState(null);
+
   const [deleteTargetDialogRow, setDeleteTargetDialogRow] = useState(null);
   const [isDeleteTargetLoading, setIsDeleteTargetLoading] = useState(false);
 
   const [open, setOpen] = useState(false);
 
-  const handleClickOpen = () => {
+  const handleClickOpen = useCallback(() => {
     setOpen(true);
-  };
+  },[]);
 
   const handleClose = () => {
     setOpen(false);
   };
+
+  const fetchUserList = useCallback(() => {
+    DataService.getUserList()
+      .then(res => {
+        console.log("get user list using api: ", res.data);
+        setTargets(res.data.user_list);
+      });
+  }, [setTargets]);
 
   const handleRequestSort = useCallback(
     (__, property) => {
@@ -129,6 +138,12 @@ function CustomTable(props) {
   const deleteTarget = useCallback(() => {
     setIsDeleteTargetLoading(true);
     setTimeout(() => {
+      DataService.deleteUser(deleteTargetDialogRow._id)
+      .catch(error => {
+        pushMessageToSnackbar({
+          text: error.response.data.message,
+        });
+      });
       setIsDeleteTargetDialogOpen(false);
       setIsDeleteTargetLoading(false);
       const _targets = [...targets];
@@ -138,17 +153,11 @@ function CustomTable(props) {
       _targets.splice(index, 1);
       setTargets(_targets);
       pushMessageToSnackbar({
-        text: "Your friend has been removed",
+        text: "User has been removed",
       });
-    }, 1500);
-  }, [
-    setIsDeleteTargetDialogOpen,
-    setIsDeleteTargetLoading,
-    pushMessageToSnackbar,
-    setTargets,
-    deleteTargetDialogRow,
-    targets,
-  ]);
+      fetchUserList();
+    }, 1000);
+  }, [deleteTargetDialogRow, targets, setTargets, pushMessageToSnackbar, fetchUserList]);
 
   const handleChangePage = useCallback(
     (_, page) => {
@@ -168,6 +177,20 @@ function CustomTable(props) {
     },
     [setIsDeleteTargetDialogOpen, setDeleteTargetDialogRow]
   );
+  const handleEditUserDialogClose = useCallback(() => {
+    setIsEditUserDialogOpen(false);
+  }, [setIsEditUserDialogOpen]);
+
+  const handleEditUserDialogOpen = useCallback(
+    (row) => {
+      console.log("edit data: ", row);
+      editForm.current.mapEditData(row);
+
+      setIsEditUserDialogOpen(true);
+      setEditUserDialogRow(row);
+    },
+    [setIsEditUserDialogOpen, setEditUserDialogRow]
+  );
 
   return (
     <Paper>
@@ -183,8 +206,26 @@ function CustomTable(props) {
           Add User
         </Button>
       </Toolbar>
-      <AddUserDialog open={open} onClose={handleClose}>
+      <AddUserDialog 
+        open={open} 
+        onClose={handleClose} 
+        onSuccess={fetchUserList}
+        pushMessageToSnackbar={pushMessageToSnackbar}>
       </AddUserDialog>
+      <EditUserDialog
+        ref={editForm}
+        open={isEditDialogOpen}
+        onClose={handleEditUserDialogClose}
+        onSuccess={fetchUserList}
+        // editData={editUserDialogRow}
+        // surname={editData.family_name}
+        // firstname={editData.first_name}
+        // username={editData.username}
+        // password={editData.password}
+        // role={editData.role}
+
+        pushMessageToSnackbar={pushMessageToSnackbar}>
+      </EditUserDialog>
       <Divider />
       <ConfirmationDialog
         open={isDeleteTargetDialogOpen}
@@ -194,7 +235,7 @@ function CustomTable(props) {
           deleteTargetDialogRow ? (
             <span>
               {"Do you really want to remove this user "}
-              <b>{deleteTargetDialogRow.name}</b>
+              <b>{deleteTargetDialogRow.username}</b>
               {" from your list?"}
             </span>
           ) : null
@@ -230,25 +271,23 @@ function CustomTable(props) {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.name}
+                        {row.first_name + ' ' + row.family_name}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.number1}
+                        {row.username}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.number2}
+                        {row.role.name}
                       </TableCell>
-                      <TableCell component="th" scope="row">
-                        {row.number3}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {row.number4}
-                      </TableCell>
+                     
                       <TableCell component="th" scope="row">
                         <Box display="flex" justifyContent="flex-end">
                           <IconButton
                             className={classes.iconButton}
-                            // onClick={}
+                            onClick={() => {
+                              handleEditUserDialogOpen(row);
+                            }}
+                          
                             aria-label="Edit"
                           >
                             <EditIcon className={classes.blackIcon} />
@@ -308,7 +347,6 @@ CustomTable.propTypes = {
   targets: PropTypes.arrayOf(PropTypes.object).isRequired,
   setTargets: PropTypes.func.isRequired,
   pushMessageToSnackbar: PropTypes.func,
-  openAddUserDialog: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(CustomTable);

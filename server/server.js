@@ -30,10 +30,22 @@ app.use(express.json());
 // app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.urlencoded({ extended: false }));
 
-const port = process.env.PORT;
+const port = process.env.PORT || 8080;
 
 // console.log that server is up and running
-app.listen(port, () => console.log('Listening on port ${port}!'));
+app.listen(port, () => console.log(`Listening on port ${port}!`));
+
+// fix cors error
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   next();
+// });
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,DELETE, POST,PUT");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  next();
+});
 
 // create a GET route
 app.get('/', (req, res) => {
@@ -41,7 +53,7 @@ app.get('/', (req, res) => {
 });
 
 // Routes
-app.use('/api/auth', authRouter);
+app.use('/api/auth/', authRouter);
 app.use('/api/manage/', managementRouter);
 
 // route not found

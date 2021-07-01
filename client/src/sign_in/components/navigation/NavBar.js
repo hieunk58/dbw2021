@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useCallback, useState } from "react";
+import React, { Fragment, useRef } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import classNames from "classnames";
@@ -17,21 +17,20 @@ import {
   Tooltip,
   Box,
   withStyles,
-  isWidthUp,
   withWidth,
 } from "@material-ui/core";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import ClassIcon from "@material-ui/icons/Class";
 import SubjectIcon from "@material-ui/icons/Subject";
 import MessageRoundedIcon from '@material-ui/icons/MessageRounded';
-import ImageIcon from "@material-ui/icons/Image";
+// import ImageIcon from "@material-ui/icons/Image";
 import PowerSettingsNewIcon from "@material-ui/icons/PowerSettingsNew";
-import MenuIcon from "@material-ui/icons/Menu";
-import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
+// import MenuIcon from "@material-ui/icons/Menu";
+// import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
 // import MessagePopperButton from "./MessagePopperButton";
 // import SideDrawer from "./SideDrawer";
 // import Balance from "./Balance";
-import NavigationDrawer from "../../../shared/components/NavigationDrawer";
+// import NavigationDrawer from "../../../shared/components/NavigationDrawer";
 
 const styles = (theme) => ({
   appBar: {
@@ -137,12 +136,19 @@ const styles = (theme) => ({
 });
 
 function NavBar(props) {
-  const { selectedTab, messages, classes, width } = props;
+  const { selectedTab, messages, classes, width, currentUser } = props;
   // Will be use to make website more accessible by screen readers
   const links = useRef([]);
   
   // Menu items on left navigation bar: Dashboard, Logout, etc
   const menuItems = [
+    // if(currentUser.role.name === "admin") {
+
+    // } else if(currentUser.role.name === "teacher") {
+
+    // } else {
+
+    // }
     {
       link: "/c/users",
       name: "Users",
@@ -181,6 +187,40 @@ function NavBar(props) {
           <SubjectIcon
             className={
               selectedTab === "Subjects"
+                ? classes.textSelected
+                : "text-white"
+            }
+            fontSize="small"
+          />
+        ),
+        mobile: <SubjectIcon className="text-white" />,
+      },
+    },
+    {
+      link: "/c/student",
+      name: "Student View",
+      icon: {
+        desktop: (
+          <SubjectIcon
+            className={
+              selectedTab === "Student"
+                ? classes.textSelected
+                : "text-white"
+            }
+            fontSize="small"
+          />
+        ),
+        mobile: <SubjectIcon className="text-white" />,
+      },
+    },
+    {
+      link: "/c/teacher",
+      name: "Teacher View",
+      icon: {
+        desktop: (
+          <SubjectIcon
+            className={
+              selectedTab === "Teacher"
                 ? classes.textSelected
                 : "text-white"
             }
@@ -236,7 +276,7 @@ function NavBar(props) {
               <ListItemText
                 className={classes.username}
                 primary={
-                  <Typography color="textPrimary">Username</Typography>
+                  <Typography color="textPrimary">{currentUser.username}</Typography>
                 }
               />
             </ListItem>
@@ -312,6 +352,7 @@ NavBar.propTypes = {
   selectedTab: PropTypes.string.isRequired,
   width: PropTypes.string.isRequired,
   classes: PropTypes.object.isRequired,
+  currentUser: PropTypes.object.isRequired
 };
 
 export default withWidth()(withStyles(styles, { withTheme: true })(NavBar));

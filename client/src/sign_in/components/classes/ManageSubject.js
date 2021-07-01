@@ -24,6 +24,8 @@ import getSorting from "../../../shared/functions/getSorting";
 import HighlightedInformation from "../../../shared/components/HighlightedInformation";
 import ConfirmationDialog from "../../../shared/components/ConfirmationDialog";
 import AddSubjectToClassDialog from "./AddSubjectToClassDialog";
+// import AddSubjectDialog from "./AddSubjectDialog";
+import DataService from "../../../services/data.service";
 
 const styles = (theme) => ({
   tableWrapper: {
@@ -74,17 +76,18 @@ const rowsPerPage = 25;
 
 
 function ManageSubject(props) {
-  const { pushMessageToSnackbar, classes, onClose } = props;
+  const { pushMessageToSnackbar, classes, onClose, subjectList, 
+      setSubjectList, teacherList, currentClass, onSuccess } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
+  // const [teacherList, setTeacherList] = useState([]);
+
   const [isDeleteTargetDialogOpen, setIsDeleteTargetDialogOpen] = useState(
     false
   );
   const [deleteTargetDialogRow, setDeleteTargetDialogRow] = useState(null);
   const [isDeleteTargetLoading, setIsDeleteTargetLoading] = useState(false);
-
-  const [subjectList, setSubjectList] = useState([]);
 
   const [open, setOpen] = useState(false);
 
@@ -108,6 +111,24 @@ function ManageSubject(props) {
     },
     [setOrder, setOrderBy, order, orderBy]
   );
+
+  // const fetchTeacherList = useCallback(() => {
+  //   DataService.getUserList()
+  //     .then(res => {
+  //       var list = res.data.user_list;
+  //       var teachers = [];
+  //       for(let i = 0; i < list.length; ++i) {
+  //         if(list[i].role.name === "teacher") {
+  //           console.log("teacher: ", list[i].username);
+  //           console.log("role: ", list[i].role.name);
+  //           teachers.push(list[i]);
+  //         }
+  //       }
+  //       setTeacherList(teachers);
+  //       // console.log("teacher list count: ", teacherList.length);
+  //       // console.log("teacher list count: ", teachers.length);
+  //     });
+  // }, [setTeacherList]);
 
   const deleteTarget = useCallback(() => {
     setIsDeleteTargetLoading(true);
@@ -152,26 +173,10 @@ function ManageSubject(props) {
     [setIsDeleteTargetDialogOpen, setDeleteTargetDialogRow]
   );
 
-  // dummy data
-  const fetchRandomSubjects = useCallback(() => {
-    const targets = [];
-    //TODO check person is empty or not before access data
-    for (let i = 0; i < 20; i += 1) {
-      const target = {
-        id: i,
-        name: "Datenbanken und Webtechnik sommer semester 2021",
-        instructor: "Andre Windisch",
-      };
-      targets.push(target);
-    }
-    setSubjectList(targets);
-  
-  }, [setSubjectList]);
 
-  useEffect(() => {
-    fetchRandomSubjects(); 
-  }, [fetchRandomSubjects]);
-  // useEffect(setSubjectList, [setSubjectList]);
+  // useEffect(() => {
+  //   fetchTeacherList();
+  // }, [fetchTeacherList]);
 
   return (
     <Paper>
@@ -199,8 +204,18 @@ function ManageSubject(props) {
         open={open}
         onClose={handleClose}
         subjectList={subjectList}
+        teacherList={teacherList}
+        currentClass={currentClass}
+        onSuccess={onSuccess}
+        pushMessageToSnackbar={pushMessageToSnackbar}
       >
       </AddSubjectToClassDialog>
+      {/* <AddSubjectDialog>
+        open={open}
+        onClose={handleClose}
+        teacherList={teacherList}
+        setTeacherList={setTeacherList}
+      </AddSubjectDialog> */}
       <Divider />
       <ConfirmationDialog
         open={isDeleteTargetDialogOpen}
@@ -210,7 +225,7 @@ function ManageSubject(props) {
           deleteTargetDialogRow ? (
             <span>
               {"Do you really want to remove this subject "}
-              <b>{deleteTargetDialogRow.name}</b>
+              <b>{deleteTargetDialogRow.subject_name}</b>
               {" from the class?"}
             </span>
           ) : null
@@ -247,10 +262,10 @@ function ManageSubject(props) {
                         </IconButton>
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.name}
+                        {row.subject_name}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.instructor}
+                        {row.teacher.first_name + " " + row.teacher.family_name}
                       </TableCell>
                       
                       <TableCell component="th" scope="row">
@@ -307,11 +322,13 @@ function ManageSubject(props) {
 
 ManageSubject.propTypes = {
   classes: PropTypes.object.isRequired,
-  pushMessageToSnackbar: PropTypes.func,
-  openAddUserDialog: PropTypes.func.isRequired,
+  pushMessageToSnackbar: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired,
   onClose: PropTypes.func,
   subjectList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  teacherList: PropTypes.arrayOf(PropTypes.object).isRequired,
   setSubjectList: PropTypes.func.isRequired,
+  setTeacherList: PropTypes.func.isRequired
 };
 
 export default withStyles(styles, { withTheme: true })(ManageSubject);

@@ -59,14 +59,14 @@ function EnhancedTableHead(props) {
                   direction={order}
                   onClick={createSortHandler(row.id)}
                 >
-                  <Typography variant="body2">{row.label}</Typography>
+                  <Typography variant="body1">{row.label}</Typography>
                 </TableSortLabel>
               </Tooltip>
             ) : (
               <TableSortLabel
                 className={classNames(classes.tableSortLabel, classes.noIcon)}
               >
-                <Typography variant="body2" className={classes.label}>
+                <Typography variant="body1" className={classes.label}>
                   {row.label}
                 </Typography>
               </TableSortLabel>
