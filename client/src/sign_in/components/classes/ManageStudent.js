@@ -24,6 +24,7 @@ import getSorting from "../../../shared/functions/getSorting";
 import HighlightedInformation from "../../../shared/components/HighlightedInformation";
 import ConfirmationDialog from "../../../shared/components/ConfirmationDialog";
 import AddStudentToClassDialog from "./AddStudentToClassDialog";
+import DataService from "../../../services/data.service";
 
 const styles = (theme) => ({
   tableWrapper: {
@@ -72,7 +73,7 @@ const rows = [
 const rowsPerPage = 25;
 
 function ManageStudent(props) {
-  const { pushMessageToSnackbar, classes, onClose } = props;
+  const { pushMessageToSnackbar, classes, onClose, currentClass } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
@@ -83,6 +84,7 @@ function ManageStudent(props) {
   const [isDeleteTargetLoading, setIsDeleteTargetLoading] = useState(false);
 
   const [studentList, setStudentList] = useState([]);
+  const [studentByClass, setStudentByClass] = useState([]);
 
   const [open, setOpen] = useState(false);
 
@@ -109,26 +111,40 @@ function ManageStudent(props) {
 
   const deleteTarget = useCallback(() => {
     setIsDeleteTargetLoading(true);
-    setTimeout(() => {
-      setIsDeleteTargetDialogOpen(false);
-      setIsDeleteTargetLoading(false);
-      const _studentList = [...studentList];
-      const index = _studentList.findIndex(
-        (element) => element.id === deleteTargetDialogRow.id
-      );
-      _studentList.splice(index, 1);
-      setStudentList(_studentList);
-      pushMessageToSnackbar({
-        text: "Subject has been removed",
+    var data = {
+      id: deleteTargetDialogRow._id
+    }
+    console.log("deregister student with id: ", data);
+    DataService.deregisterStudent(data)
+      .then((res) => {
+        setTimeout(() => {
+          setIsDeleteTargetDialogOpen(false);
+          setIsDeleteTargetLoading(false);
+          const _studentByClass = [...studentByClass];
+          const index = _studentByClass.findIndex(
+            (element) => element.id === deleteTargetDialogRow.id
+          );
+          _studentByClass.splice(index, 1);
+          // setStudentByClass(_studentByClass);
+          pushMessageToSnackbar({
+            // text: "Student has been removed",
+            text: res.data.message,
+          });
+          getStudentByClass(currentClass._id);
+        }, 1500);
+      })
+      .catch(error => {
+        pushMessageToSnackbar({
+          text: error.response.data.message,
+        });
       });
-    }, 1500);
   }, [
     setIsDeleteTargetDialogOpen,
     setIsDeleteTargetLoading,
     pushMessageToSnackbar,
-    setStudentList,
+    // setStudentByClass,
     deleteTargetDialogRow,
-    studentList,
+    studentByClass,
   ]);
 
   const handleChangePage = useCallback(
@@ -150,20 +166,43 @@ function ManageStudent(props) {
     [setIsDeleteTargetDialogOpen, setDeleteTargetDialogRow]
   );
 
+  const getStudentByClass = useCallback((classId) => {
+    DataService.getStudentByClass(classId)
+      .then((res) => {
+        console.log("student list by class: ", res.data.list_student);
+        // var subjects = [];
+        // console.log("current selected class id: ", classId);
+        // for(let i = 0; i < studentList.length; ++i) {
+        //   console.log("subject.class: ", studentList[i].class._id);
+        //   if(subjectList[i].class._id === classId) {
+        //     subjects.push(subjectList[i]);
+        //   }
+        // }
+        setStudentByClass(res.data.list_student);
+      })
+  }, []);
+
   const fetchRandomStudents = useCallback(() => {
-    const students = [];
-    //TODO check person is empty or not before access data
-    for (let i = 0; i < 20; i += 1) {
-      const student = {
-        id: i,
-        name: "Daniel Richter",
-        username: "dr2021"
-      };
-      students.push(student);
-    }
-    setStudentList(students);
+    DataService.getUserList()
+      .then(res => {
+        console.log("[Main.js] get student list using api: ", res.data);
+        var list = res.data.user_list;
+        var students = [];
+        for(let i = 0; i < list.length; ++i) {
+          if(list[i].role.name === "student") {
+            console.log("student: ", list[i].username);
+            console.log("role: ", list[i].role.name);
+            students.push(list[i]);
+          }
+        }
+        setStudentList(students);
+      });
   
   }, [setStudentList]);
+
+  useEffect(() => {
+    getStudentByClass(currentClass._id);
+  }, [currentClass._id, getStudentByClass, open]);
 
   useEffect(() => {
     fetchRandomStudents(); 
@@ -194,7 +233,11 @@ function ManageStudent(props) {
       <AddStudentToClassDialog 
         open={open}
         onClose={handleClose}
-        studentList={studentList}
+        // onSuccess={}
+        currentClass={currentClass}
+        studentList={studentList} // all students in user table
+        // setStudentList={setStudentList}
+        pushMessageToSnackbar={pushMessageToSnackbar}
       >
       </AddStudentToClassDialog>
       <Divider />
@@ -217,17 +260,17 @@ function ManageStudent(props) {
       />
       <Box width="100%">
         <div className={classes.tableWrapper}>
-          {studentList.length > 0 ? (
+          {studentByClass.length > 0 ? (
             <Table aria-labelledby="tableTitle">
               <EnhancedTableHead
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
-                rowCount={studentList.length}
+                rowCount={studentByClass.length}
                 rows={rows}
               />
               <TableBody>
-                {stableSort(studentList, getSorting(order, orderBy))
+                {stableSort(studentByClass, getSorting(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => (
                     <TableRow hover tabIndex={-1} key={index}>
@@ -244,10 +287,10 @@ function ManageStudent(props) {
                         
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.name}
+                        {row.student.first_name + " " + row.student.family_name}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.username}
+                        {row.student.username}
                       </TableCell>
                       
                       <TableCell component="th" scope="row">
@@ -278,7 +321,7 @@ function ManageStudent(props) {
         <div className={classes.alignRight}>
           <TablePagination
             component="div"
-            count={studentList.length}
+            count={studentByClass.length}
             rowsPerPage={rowsPerPage}
             page={page}
             backIconButtonProps={{
@@ -291,8 +334,8 @@ function ManageStudent(props) {
             classes={{
               select: classes.dNone,
               selectIcon: classes.dNone,
-              actions: studentList.length > 0 ? classes.dBlock : classes.dNone,
-              caption: studentList.length > 0 ? classes.dBlock : classes.dNone,
+              actions: studentByClass.length > 0 ? classes.dBlock : classes.dNone,
+              caption: studentByClass.length > 0 ? classes.dBlock : classes.dNone,
             }}
             labelRowsPerPage=""
           />
@@ -305,10 +348,9 @@ function ManageStudent(props) {
 ManageStudent.propTypes = {
   classes: PropTypes.object.isRequired,
   pushMessageToSnackbar: PropTypes.func,
-  // openAddUserDialog: PropTypes.func.isRequired,
   onClose: PropTypes.func,
-  studentList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  setStudentList: PropTypes.func.isRequired,
+  // studentList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  // setStudentList: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles, { withTheme: true })(ManageStudent);

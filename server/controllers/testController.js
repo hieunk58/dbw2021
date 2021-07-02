@@ -118,8 +118,8 @@ exports.test_create_post = function(req, res) {
         }
     );
 
-    // check whether subject already has this test or not
-    Test.findOne({ 'test_name': test_name, 'subject': subject_id })
+    // check whether subject already has this test(same name, same date) or not
+    Test.findOne({ 'test_name': test_name, 'subject': subject_id, 'test_date': test_date })
         .exec(function(err, found_test) {
             if(err) {
                 res.status(500).send({

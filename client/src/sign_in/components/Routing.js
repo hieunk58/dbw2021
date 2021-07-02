@@ -62,8 +62,12 @@ function Routing(props) {
     currentUser,
     subjectListByTeacher,
     setSubjectListByTeacher,
+    subjectListByClass,
     studentList,
-    setStudentList
+    setStudentList,
+    testResultList,
+    setTestResultList,
+    studyingClass
     // openAddBalanceDialog,
   } = props;
 
@@ -80,7 +84,7 @@ function Routing(props) {
           setClassList={setClassList}
           subjectList={subjectList}
           // setSubjectList={setSubjectList}
-          // studentList={studentList} // get all user then filter by role=student
+          // studentList={studentList}
           // setStudentList={setStudentList}
         />
         <PropsRoute
@@ -106,6 +110,10 @@ function Routing(props) {
           // path="/profile/student"
           path="/c/student"
           component={StudentPage}
+          currentUser={currentUser}
+          studyingClass={studyingClass}
+          testResultList={testResultList}
+          subjectList={subjectListByClass}
         />
         <PropsRoute
           // teacher view

@@ -7,6 +7,7 @@ var subject_controller = require("../controllers/subjectController");
 var test_controller = require("../controllers/testController");
 var result_controller = require("../controllers/resultController");
 var user_controller = require("../controllers/userController");
+var enrollment_controller = require("../controllers/enrollmentController");
 
 
 /// USER ROUTES ///
@@ -35,6 +36,14 @@ router.post('/class/:id/delete', class_controller.class_delete_post);
 router.get('/class/:id', class_controller.class_detail);
 /// END CLASS ROUTES ///
 
+/// ENROLLMENT ROUTES ///
+router.get('/enrollments', enrollment_controller.enrollment_list);
+router.get('/enrollment/student', enrollment_controller.student_enrollment_get);
+router.post('/enrollment/register',  enrollment_controller.register_student_post);
+router.post('/enrollment/deregister', enrollment_controller.deregister_student_post);
+router.get('/enrollment/:id', enrollment_controller.class_student_get);
+/// ENROLLMENT ROUTES ///
+
 /// SUBJECT ROUTES ///
 // GET subject list
 router.get('/subjects', subject_controller.subject_list);
@@ -62,7 +71,8 @@ router.get('/test/:id', test_controller.test_detail);
 /// END TEST ROUTES ///
 
 /// TEST RESULT ROUTES ///
-// router.get('/tests', test_controller.test_list);
+router.get('/results', result_controller.result_list); // result list
+router.get('/result/student', result_controller.student_result_list);
 // POST create new test
 // router.post('/test/create', test_controller.test_create_post);
 // POST update test result

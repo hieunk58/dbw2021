@@ -3,6 +3,7 @@ var User = require('../models/user');
 var Subject = require('../models/subject');
 var Result = require('../models/result');
 var Role = require('../models/role');
+var Enrollment = require('../models/enrollment');
 
 
 // Display list of all user
@@ -122,6 +123,7 @@ exports.user_update_post = function (req, res) {
 // check user is teacher or student
 exports.user_delete_post = function(req, res) {
     var id = req.params.id;
+    var msg = "";
     
     User.findById(id)
         .populate('role')
@@ -140,9 +142,12 @@ exports.user_delete_post = function(req, res) {
                 return;
             }
             var role = found_user.role;
-            if(role.name == "teacher") {
+            console.log("delete user with role: ", role);
+            console.log("delete user with id: ", id);
+            if(role.name === "teacher") {
+                console.log("role is teacher");
                 // if teacher is assigned at least one subject that not archived -> cannot remove
-                Subject.findOne({teacher: id, isArchived: false})
+                Subject.findOne({'teacher': id, 'isArchived': false})
                     .exec(function(err, found_one) {
                         if(err) {
                             res.status(500).send({
@@ -151,37 +156,83 @@ exports.user_delete_post = function(req, res) {
                             return;
                         }
                         if(found_one) {
+                            console.log("found a teacher has 1 subject not archived: ", found_one);
                             res.status(500).send({
-                                message: 'Cannot delete this teacher. Teacher is assigned at least one subject that is not archived'
+                                message: 'Cannot delete teacher has dependent subjects'
                             });
                             return;
                         }
+                        else {
+                            // delete normally
+                            msg = deleteUser(id);
+                            res.send({message: msg});
+                        }
                     });
     
-            } else if(role.name == "student") {
+            } else if(role.name === "student") {
                 // delete all test results
                 // STUDENT find all test result that have user id = deleted user id
                 Result.deleteMany({student: id});
+                // delete enrollment {class, student}
+                console.log("remove student with id: ", id);
+                Enrollment.findOneAndRemove({'student': id})
+                    .exec(function(err) {
+                        if(err) {
+                            res.status(500).send({
+                                message: 'Cannot delete this user'
+                            });
+                        }
+                        // deleteUser(id);
+                        msg = deleteUser(id);
+                        res.send({message: msg});
+                    })
             } else {
                 // admin, delete normally
+                // deleteUser(id);
+                msg = deleteUser(id);
+                res.send({message: msg});
             }
-        });
-   
-    // find by id and remove
-    User.findByIdAndRemove(id)
-        .exec(function (err, result) {
-            if (err) { 
-                res.status(500).send({
-                    message: "Cannot delete user. User not found"
-                });
-                return;
-            }
-            if(!result) {
-                res.status(404).send({
-                message: `Cannot delete user with id=${id}`
-            });
-            } else {
-                res.send({ message: "User was deleted successfully." });
-            }
+
+             // find by id and remove
+            // User.findByIdAndRemove(id)
+            // .exec(function (err, result) {
+            //     if (err) { 
+            //         res.status(500).send({
+            //             message: "Cannot delete user. User not found"
+            //         });
+            //         return;
+            //     }
+            //     if(!result) {
+            //         res.status(404).send({
+            //         message: `Cannot delete user with id=${id}`
+            //     });
+            //     } else {
+            //         res.send({ message: "User was deleted successfully." });
+            //     }
+            // });
         });
 };
+
+function deleteUser(id) {
+    var msg = "";
+    User.findByIdAndRemove(id)
+            .exec(function (err, result) {
+                if (err) { 
+                    // res.status(500).send({
+                    //     message: "Cannot delete user. User not found"
+                    // });
+                    msg = "Cannot delete user. User not found";
+                    return msg;
+                }
+                if(!result) {
+                    // res.status(404).send({
+                    // message: `Cannot delete user with id=${id}`
+                    msg = "Cannot delete this user";
+                    return msg;
+                } else {
+                    msg = "User was deleted successfully."
+                    // res.send({ message: "User was deleted successfully." });
+                }
+            });
+    return msg;
+}

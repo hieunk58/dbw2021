@@ -88,7 +88,7 @@
   function CustomTable(props) {
     const editForm = useRef();
 
-    const { pushMessageToSnackbar, classes, selectClass, onSuccess} = props;
+    const { pushMessageToSnackbar, classes, selectClass, studentList, setStudentList} = props;
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState(null);
     const [page, setPage] = useState(0);
@@ -101,7 +101,7 @@
     const [currentSelectedClass, setCurrentSelectedClass] = useState(null);
     const [subjectList, setSubjectList] = useState([]);
     const [teacherList, setTeacherList] = useState([]);
-    const [studentList, setStudentList] = useState([]);
+    const [studentByClass, setStudentByClass] = useState([]);
     const [classList, setClassList] = useState([]);
     const [subjectByClass, setSubjectByClass] = useState([]);
 
@@ -181,9 +181,21 @@
       setSubjectByClass(subjects);
     }, [subjectList]);
 
-    // const passSubjectList = () => {
-
-    // }
+    const getStudentByClass = useCallback((classId) => {
+      DataService.getStudentByClass(classId)
+        .then((res) => {
+          console.log("student list: ", res.data.list_student);
+          // var subjects = [];
+          // console.log("current selected class id: ", classId);
+          // for(let i = 0; i < studentList.length; ++i) {
+          //   console.log("subject.class: ", studentList[i].class._id);
+          //   if(subjectList[i].class._id === classId) {
+          //     subjects.push(subjectList[i]);
+          //   }
+          // }
+          setStudentByClass(res.data.list_student);
+        })
+    }, []);
 
     const openManageSubjectPage = useCallback((row) => {
       setCurrentSelectedClass(row);
@@ -196,9 +208,11 @@
       setIsManageSubjectPageOpen(false);
     }, [setIsManageSubjectPageOpen]);
 
-    const openManageStudentPage = useCallback(() => {
+    const openManageStudentPage = useCallback((row) => {
+      setCurrentSelectedClass(row);
+      getStudentByClass(row._id);
       setIsManageStudentPageOpen(true);
-    }, [setIsManageStudentPageOpen]);
+    }, [getStudentByClass]);
 
     const closeManageStudentPage = useCallback(() => {
       setIsManageStudentPageOpen(false);
@@ -298,8 +312,10 @@
     if(isManageStudentPageOpen)
     {
       return <ManageStudent
-          studentList={studentList}
+          currentClass={currentSelectedClass}
+          studentList={studentList} // all students
           setStudentList={setStudentList}
+          studentByClass={studentByClass} // student of each class
           onClose={closeManageStudentPage}
           pushMessageToSnackbar={pushMessageToSnackbar}
         />

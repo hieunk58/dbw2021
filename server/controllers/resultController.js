@@ -2,21 +2,58 @@ var async = require('async')
 var Test = require('../models/test')
 var Result = require('../models/result')
 
-// result list by test id
+// result list
 exports.result_list = function (req, res, next) {
-    var test_id = req.body.test_id;
-
-    Result.find({'test': test_id})
+    // var test_id = req.body.test_id;
+    Result.find()
         .sort([['score', 'ascending']])
         .exec(function (err, list_results) {
             if (err) { 
                 res.status(500).send({
-                    message:
-                      err.message || "Cannot retrieve test result of this subject."
+                    message: "Cannot retrieve test result."
                   });
+                return;
             }
             // Successful
             res.send({ result_list: list_results });
+        })
+};
+
+// result list by student id
+exports.student_result_list = function (req, res, next) {
+    var student_id = req.body.student_id;
+
+    // Result.find({'student': test_id})
+    //     .sort([['score', 'ascending']])
+    //     .exec(function (err, list_results) {
+    //         if (err) { 
+    //             res.status(500).send({
+    //                 message:
+    //                   err.message || "Cannot retrieve test result of this subject."
+    //               });
+    //         }
+
+    //         list_results.aggregate([{
+    //             $group: {
+    //                 _id: "$subject",
+    //                 avgScore: {$avg: "$score"}
+    //             }
+    //         }])
+    //         // Successful
+    //         res.send({ result_list: list_results });
+    //     })
+    Result.aggregate().match({'student': student_id}).group({_id: "$subject", avgScore: "$score"})
+        .exec(function(err, result) {
+            if(err) {
+                res.status(500).send({
+                    message: "Cannot retrieve test result of this subject."
+                  });
+                return;
+            }
+            // populate subject
+            //Result.populate(result, {path: 'subject'})
+            // Successful
+            res.send({ result_list: result });
         })
 };
 
@@ -51,6 +88,7 @@ exports.result_detail = function (req, res, next) {
 
 };
 
+
 // Handle update test result on POST.
 exports.result_update_post = function (req, res) {
     // update score of each student
@@ -74,3 +112,28 @@ exports.result_update_post = function (req, res) {
             }
         });
 };
+
+
+// // Handle create test result on POST.
+// exports.result_create_post = function (req, res) {
+//     // update score of each student
+//     var student = req.params.student;
+//     var score = req.body.score;
+
+//     Result.(id, { 'score': new_score })
+//         .exec(function (err, result) {
+//             if (err) { 
+//                 res.status(500).send({
+//                     message:
+//                       err.message || "Cannot update this test result."
+//                 });
+//             }
+//             if(!result) {
+//                 res.status(404).send({
+//                 message: `Cannot update test result with id=${id}`
+//               });
+//             } else {
+//                 res.send({ message: "Test result was updated successfully." });
+//             }
+//         });
+// };

@@ -19,6 +19,28 @@ class DataService {
         console.log("delete class with id: ", id);
         return api.post(`/class/${id}/delete`)
     }
+
+    // enrollment
+    getEnrollmentList() {
+        console.log("getEnrollmentList");
+        return api.get("/enrollments");
+    }
+    getStudentByClass(id) {
+        console.log("get student list by class : ", id);
+        return api.get(`/enrollment/${id}`);
+    }
+    getStudyingClass(data) {
+        console.log("get current studying class by student id: ", data);
+        return api.get("/enrollment/student", data);
+    }
+    registerStudent(data) {
+        console.log("register student : ", data);
+        return api.post("/enrollment/register", data);
+    }
+    deregisterStudent(data) {
+        console.log("deregister student : ", data);
+        return api.post("/enrollment/deregister", data);
+    }
     
     // user
     getUserList() { 

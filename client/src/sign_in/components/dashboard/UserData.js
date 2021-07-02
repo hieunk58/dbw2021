@@ -137,26 +137,29 @@ function CustomTable(props) {
 
   const deleteTarget = useCallback(() => {
     setIsDeleteTargetLoading(true);
-    setTimeout(() => {
-      DataService.deleteUser(deleteTargetDialogRow._id)
+    DataService.deleteUser(deleteTargetDialogRow._id)
+      .then(() => {
+        setTimeout(() => {
+          console.log("delete user: ", deleteTargetDialogRow);
+          setIsDeleteTargetDialogOpen(false);
+          setIsDeleteTargetLoading(false);
+          const _targets = [...targets];
+          const index = _targets.findIndex(
+            (element) => element.id === deleteTargetDialogRow.id
+          );
+          _targets.splice(index, 1);
+          setTargets(_targets);
+          fetchUserList();
+          pushMessageToSnackbar({
+            text: "User has been removed",
+          });
+        }, 1000);
+      })
       .catch(error => {
         pushMessageToSnackbar({
           text: error.response.data.message,
         });
       });
-      setIsDeleteTargetDialogOpen(false);
-      setIsDeleteTargetLoading(false);
-      const _targets = [...targets];
-      const index = _targets.findIndex(
-        (element) => element.id === deleteTargetDialogRow.id
-      );
-      _targets.splice(index, 1);
-      setTargets(_targets);
-      pushMessageToSnackbar({
-        text: "User has been removed",
-      });
-      fetchUserList();
-    }, 1000);
   }, [deleteTargetDialogRow, targets, setTargets, pushMessageToSnackbar, fetchUserList]);
 
   const handleChangePage = useCallback(
