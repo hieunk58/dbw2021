@@ -21,11 +21,8 @@ exports.class_student_get = function(req, res) {
 }
 
 exports.enrollment_list = function(req, res) {
-    var studentId = req.body.studentId;
-    console.log("studentId: ", studentId);
-
-    
     Enrollment.find()
+    .populate('student')
         .exec(function(err, result) {
             if(err) {
                 res.status(500).send({
@@ -71,7 +68,7 @@ exports.register_student_post = function(req, res) {
                 });
                 return;
             }
-            // delete previous one successfully
+            // delete previous one successfully, save new one
             new_enrollment.save(function(err) {
                 if(err) {
                     res.status(500).send({

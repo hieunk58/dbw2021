@@ -16,8 +16,12 @@ import {
   withStyles,
 } from "@material-ui/core";
 
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+
 import LibraryBooksIcon from '@material-ui/icons/ChromeReaderMode';
 import SubjectIcon from "@material-ui/icons/Subject";
+import GetAppIcon from '@material-ui/icons/GetApp';
 // import AssignmentIcon from "@material-ui/icons/Assignment";
 import EnhancedTableHead from "../../../shared/components/EnhancedTableHead";
 import stableSort from "../../../shared/functions/stableSort";
@@ -139,6 +143,31 @@ function CustomTable(props) {
     [setPage]
   );
 
+  const exportToPdf = () => {
+    const unit = "pt";
+    const size = "A4"; // Use A1, A2, A3 or A4
+    const orientation = "portrait"; // portrait or landscape
+
+    const marginLeft = 40;
+    const doc = new jsPDF(orientation, unit, size);
+    doc.setFontSize(16);
+
+    const title = "My Result";
+    const headers = [["SUBJECT NAME", "GRADE"]];
+
+    const data = subjectList.map(elem => [elem.subject_name, elem.class.class_name]); //todo show avg grade
+
+    let content = {
+      startY: 50,
+      head: headers,
+      body: data
+    };
+
+    doc.text(title, marginLeft, 40);
+    doc.autoTable(content);
+    doc.save("result_report.pdf")
+  }
+
 
   // const fetchTestListBySubject = useCallback((currentSubject) => {
   //   // get test list by subject id
@@ -174,9 +203,29 @@ function CustomTable(props) {
 
   return (
     <Paper>
-      <Toolbar className={classes.toolbar}>
-        <Typography variant="h6">Subject List</Typography>
-      </Toolbar>
+        <Toolbar className={classes.toolbar}>
+          <Box display="flex" width="100%" justifyContent="flex-start">
+            <Typography variant="h6">Subject List</Typography>
+          </Box>
+          <Box display="flex" width="100%" justifyContent="flex-end">
+            <Tooltip
+              title="Export"
+              placement="top"
+            >
+              <IconButton
+                className={classes.iconButton}
+                width={50}
+                height={50}
+                onClick={() => {
+                  exportToPdf()
+                }}
+                aria-label="Export"
+              >
+                <GetAppIcon className={classes.blackIcon} />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Toolbar>
       <ResultReport
         open={open}
         onClose={handleClose}

@@ -32,6 +32,7 @@ exports.test_detail = function (req, res, next) {
         },
         test_results: function (callback) {
             Result.find({ 'test': req.params.id })
+                .populate('test')
                 .exec(callback)
         },
 
@@ -85,23 +86,23 @@ exports.test_delete_post = function(req, res) {
     var id = req.params.id;
     
     Test.findByIdAndRemove(id)
-        .exec(function (err, result) {
+        .exec(function (err) {
             if (err) { 
                 res.status(500).send({
-                    message:
-                    err.message || "Cannot delete test. Test not found"
+                    message: "Cannot delete this test. Test not found"
                 });
                 return;
             }
-            if(!result) {
-                res.status(404).send({
-                message: `Cannot delete test with id=${id}`
-            });
-            } else {
-                // remove test result
-                Result.deleteMany({'test': id});
-                res.send({ message: "Test was deleted successfully." });
-            }
+            Result.deleteMany({'test': id})
+                .exec(function(err) {
+                    if(err) {
+                        res.status(500).send({
+                            message: "Cannot delete dependent test results."
+                        });
+                        return;
+                    }
+                })
+            res.send({ message: "Test was deleted successfully." });
         });
 };
 
@@ -148,4 +149,26 @@ exports.test_create_post = function(req, res) {
                 });
             }
         });
+};
+
+exports.test_detail = function (req, res, next) {
+    var id = req.params.id;
+    async.parallel({
+        test: function(callback) {
+            Test.findById(id).exec(callback);
+        },
+        // find all test that have subject id = subject id
+        result_list: function(callback) {
+            Result.find({ 'test': id }).populate('student').exec(callback);
+        },
+        
+    }, function(err, results) {
+        if(err) {
+            res.status(500).send({
+                message: "Cannot get detail of this test. Test not found."
+            });
+            return;
+        }
+        res.send({list_result: results.result_list});
+    })
 };

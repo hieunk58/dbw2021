@@ -90,7 +90,7 @@ exports.user_update_post = function (req, res) {
     var new_user = new User(
         {
             _id: id, // using old id otherwise this will be new user id
-            first_name: req.body.user_name,
+            first_name: req.body.first_name,
             family_name: req.body.family_name,
             username: req.body.username,
             password: bcrypt.hashSync(req.body.password, 8),
@@ -172,7 +172,15 @@ exports.user_delete_post = function(req, res) {
             } else if(role.name === "student") {
                 // delete all test results
                 // STUDENT find all test result that have user id = deleted user id
-                Result.deleteMany({student: id});
+                Result.deleteMany({student: id})
+                    .exec(function(err) {
+                        if(err) {
+                            res.status(500).send({
+                                message: 'Cannot delete this user'
+                            });
+                            return;
+                        }
+                    })
                 // delete enrollment {class, student}
                 console.log("remove student with id: ", id);
                 Enrollment.findOneAndRemove({'student': id})
@@ -192,24 +200,6 @@ exports.user_delete_post = function(req, res) {
                 msg = deleteUser(id);
                 res.send({message: msg});
             }
-
-             // find by id and remove
-            // User.findByIdAndRemove(id)
-            // .exec(function (err, result) {
-            //     if (err) { 
-            //         res.status(500).send({
-            //             message: "Cannot delete user. User not found"
-            //         });
-            //         return;
-            //     }
-            //     if(!result) {
-            //         res.status(404).send({
-            //         message: `Cannot delete user with id=${id}`
-            //     });
-            //     } else {
-            //         res.send({ message: "User was deleted successfully." });
-            //     }
-            // });
         });
 };
 

@@ -32,11 +32,14 @@ exports.subject_detail = function (req, res, next) {
     var id = req.params.id;
     async.parallel({
         suject: function(callback) {
-            Subject.findById().exec(callback);
+            Subject.findById(id).exec(callback);
         },
         // find all test that have subject id = subject id
         test_list: function(callback) {
             Test.find({ 'subject': id }).exec(callback);
+        },
+        result_list: function(callback) {
+            Result.find({ 'subject': id }).exec(callback);
         },
         
     }, function(err, results) {
@@ -46,8 +49,9 @@ exports.subject_detail = function (req, res, next) {
             });
             return;
         }
-        res.send({list_test: results.test_list});
-});
+        res.send({list_test: results.test_list, list_result: results.result_list});
+    })
+};
     // Subject.find()
     //     .sort([['subject_name', 'ascending']])
     //     .exec(function (err, list_subjects) {
@@ -61,8 +65,6 @@ exports.subject_detail = function (req, res, next) {
     //         // Successful
     //         res.send({subject_list: list_subjects });
     //     })
-
-};
 
 // Handle subject update name and assigned teacher on POST.
 exports.subject_update_post = function (req, res) {

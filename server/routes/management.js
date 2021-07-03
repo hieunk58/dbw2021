@@ -74,10 +74,11 @@ router.get('/test/:id', test_controller.test_detail);
 router.get('/results', result_controller.result_list); // result list
 router.get('/result/student', result_controller.student_result_list);
 // POST create new test
-// router.post('/test/create', test_controller.test_create_post);
+router.post('/result/create', result_controller.result_create_post);
 // POST update test result
 router.post('/result/:id/update', result_controller.result_update_post);
 // POST delete a test
+router.post('/result/:id/delete', result_controller.result_delete_post);
 /// END TEST RESULT ROUTES ///
 
 module.exports = router;

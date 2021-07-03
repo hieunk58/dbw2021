@@ -6,6 +6,7 @@ var Result = require('../models/result')
 exports.result_list = function (req, res, next) {
     // var test_id = req.body.test_id;
     Result.find()
+        .populate('test')
         .sort([['score', 'ascending']])
         .exec(function (err, list_results) {
             if (err) { 
@@ -21,7 +22,7 @@ exports.result_list = function (req, res, next) {
 
 // result list by student id
 exports.student_result_list = function (req, res, next) {
-    var student_id = req.body.student_id;
+    var student_id = req.body.studentId;
 
     // Result.find({'student': test_id})
     //     .sort([['score', 'ascending']])
@@ -42,11 +43,11 @@ exports.student_result_list = function (req, res, next) {
     //         // Successful
     //         res.send({ result_list: list_results });
     //     })
-    Result.aggregate().match({'student': student_id}).group({_id: "$subject", avgScore: "$score"})
+    Result.aggregate().match({'student': student_id}).group({_id: "$subject"})
         .exec(function(err, result) {
             if(err) {
                 res.status(500).send({
-                    message: "Cannot retrieve test result of this subject."
+                    message: err.message// "Cannot retrieve test result of this student."
                   });
                 return;
             }
@@ -100,40 +101,75 @@ exports.result_update_post = function (req, res) {
             if (err) { 
                 res.status(500).send({
                     message:
-                      err.message || "Cannot update this test result."
+                      err.message || "Cannot update this test result. Test result not found"
                 });
             }
             if(!result) {
                 res.status(404).send({
-                message: `Cannot update test result with id=${id}`
+                message: "Cannot update this test result"
               });
             } else {
-                res.send({ message: "Test result was updated successfully." });
+                res.send({ message: "Result was updated successfully." });
             }
         });
 };
 
 
 // // Handle create test result on POST.
-// exports.result_create_post = function (req, res) {
-//     // update score of each student
-//     var student = req.params.student;
-//     var score = req.body.score;
+exports.result_create_post = function (req, res) {
+    var new_result = new Result({
+        test: req.body.testId,
+        student: req.body.studentId,
+        subject: req.body.subjectId,
+        score: req.body.score
+    });
 
-//     Result.(id, { 'score': new_score })
-//         .exec(function (err, result) {
-//             if (err) { 
-//                 res.status(500).send({
-//                     message:
-//                       err.message || "Cannot update this test result."
-//                 });
-//             }
-//             if(!result) {
-//                 res.status(404).send({
-//                 message: `Cannot update test result with id=${id}`
-//               });
-//             } else {
-//                 res.send({ message: "Test result was updated successfully." });
-//             }
-//         });
-// };
+    // console.log('create new result test id: ', req.body.testId);
+    // console.log('create new result student id: ', req.body.studentId);
+    // console.log('create new result subject id: ', req.body.subjectId);
+    // console.log('create new result score: ', req.body.score);
+
+
+    // check create test result 2 times for same student in the same test of 1 subject
+    Result.findOne({'test': req.body.testId, 
+        'student': req.body.studentId, 
+        'subject': req.body.subjectId})
+        .exec(function (err, found) {
+            if (err) { 
+                res.status(500).send({
+                    message: "Cannot create test result."
+                });
+                return;
+            }
+            if(found) {
+                res.status(500).send({
+                    message: "Test result for this student is already created."
+                });
+                return;
+            }
+            new_result.save(function(err) {
+                if(err) {
+                    res.status(500).send({
+                        message: "Cannot create test result"
+                    });
+                    return;
+                }
+                res.send({ message: "Result was created successfully." });
+            });
+        });
+};
+
+exports.result_delete_post = function(req, res) {
+    var id = req.params.id;
+    
+    Result.findByIdAndRemove(id)
+        .exec(function (err) {
+            if (err) { 
+                res.status(500).send({
+                    message: "Cannot delete this test result. Test result not found"
+                });
+                return;
+            }
+            res.send({ message: "Test result was deleted successfully." });
+        });
+};

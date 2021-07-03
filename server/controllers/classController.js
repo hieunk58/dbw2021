@@ -144,6 +144,7 @@ exports.class_delete_post = function(req, res) {
                     });
                     return;
                 }
+                //TODO DELETE ENROLLMENT
                 res.send({ message: "Class was deleted successfully." });
             });
     });

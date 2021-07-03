@@ -78,8 +78,6 @@
       label: "",
     },
     { id: "name", numeric: false, label: "Name", },
-    { id: "number1", numeric: false, label: "Number of subjects" },
-    { id: "number2", numeric: false, label: "Number of students" },
     { id: "actions", numeric: false, label: "", },
   ];
 
@@ -407,13 +405,6 @@
                         <TableCell component="th" scope="row">
                           {row.class_name}
                         </TableCell>
-                        <TableCell component="th" scope="row">
-                          {row.number1}
-                        </TableCell>
-                        <TableCell component="th" scope="row">
-                          {row.number2}
-                        </TableCell>
-                        
                         <TableCell component="th" scope="row">
                           <Box display="flex" justifyContent="flex-end">
                           <Tooltip

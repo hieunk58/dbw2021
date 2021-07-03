@@ -2,7 +2,7 @@ import React, { memo } from "react";
 import PropTypes from "prop-types";
 import { Switch } from "react-router-dom";
 import { withStyles } from "@material-ui/core";
-import Dashboard from "./dashboard/Dashboard";
+import Dashboard from "./users/Dashboard";
 import Classes from "./classes/Classes";
 import Subjects from "./subjects/Subjects";
 import StudentPage from "./student/StudentPage";

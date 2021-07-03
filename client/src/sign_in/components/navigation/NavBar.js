@@ -21,7 +21,7 @@ import {
 } from "@material-ui/core";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import ClassIcon from "@material-ui/icons/Class";
-import SubjectIcon from "@material-ui/icons/Subject";
+// import SubjectIcon from "@material-ui/icons/Subject";
 import MessageRoundedIcon from '@material-ui/icons/MessageRounded';
 // import ImageIcon from "@material-ui/icons/Image";
 import PowerSettingsNewIcon from "@material-ui/icons/PowerSettingsNew";
@@ -211,7 +211,7 @@ function NavBar(props) {
           name: "Teacher View",
           icon: {
             desktop: (
-              <SubjectIcon
+              <DashboardIcon
                 className={
                   selectedTab === "Teacher"
                     ? classes.textSelected
@@ -220,7 +220,7 @@ function NavBar(props) {
                 fontSize="small"
               />
             ),
-            mobile: <SubjectIcon className="text-white" />,
+            mobile: <DashboardIcon className="text-white" />,
           },
         }
       ] 
@@ -232,7 +232,7 @@ function NavBar(props) {
           name: "Student View",
           icon: {
             desktop: (
-              <SubjectIcon
+              <DashboardIcon
                 className={
                   selectedTab === "Student"
                     ? classes.textSelected
@@ -241,7 +241,7 @@ function NavBar(props) {
                 fontSize="small"
               />
             ),
-            mobile: <SubjectIcon className="text-white" />,
+            mobile: <DashboardIcon className="text-white" />,
           },
         }
       ]
