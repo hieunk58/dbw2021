@@ -12,15 +12,14 @@ import {
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import HomeIcon from "@material-ui/icons/Home";
-// import HowToRegIcon from "@material-ui/icons/HowToReg";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
-import BookIcon from "@material-ui/icons/Book";
 import NavigationDrawer from "../../../shared/components/NavigationDrawer";
 
 const styles = theme => ({
   appBar: {
     boxShadow: theme.shadows[6],
-    backgroundColor: theme.palette.common.black
+    backgroundColor: theme.palette.common.white
+    // backgroundColor: "#e0e0e0"
   },
   toolbar: {
     display: "flex",
@@ -55,11 +54,6 @@ function NavBar(props) {
       icon: <HomeIcon className="text-white" />
     },
     {
-      link: "/blog",
-      name: "Blog",
-      icon: <BookIcon className="text-white" />
-    },
-    {
       name: "Login",
       onClick: openLoginDialog,
       icon: <LockOpenIcon className="text-white" />
@@ -74,7 +68,7 @@ function NavBar(props) {
               variant="h4"
               className={classes.brandText}
               display="inline"
-              color="white"
+              color="primary"
             >
               TU Chemnitz
             </Typography>
@@ -87,7 +81,7 @@ function NavBar(props) {
                 onClick={handleMobileDrawerOpen}
                 aria-label="Open Navigation"
               >
-                <MenuIcon color="primary" />
+                <MenuIcon/>
               </IconButton>
             </Hidden>
             <Hidden smDown>
@@ -102,7 +96,7 @@ function NavBar(props) {
                     >
                       <Button
                         // Home, Blog button color
-                        color="secondary"
+                        color="primary"
                         size="large"
                         classes={{ text: classes.menuButtonText }}
                       >
@@ -114,7 +108,7 @@ function NavBar(props) {
                 return (
                   <Button
                     // Sign in button color
-                    color="secondary"
+                    color="primary"
                     size="large"
                     onClick={element.onClick}
                     classes={{ text: classes.menuButtonText }}

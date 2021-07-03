@@ -5,14 +5,12 @@ import {
   Grid,
   Typography,
   Card,
-//   Button,
   Hidden,
   Box,
   withStyles,
   withWidth,
   isWidthUp,
 } from "@material-ui/core";
-// import WaveBorder from "../../../shared/components/WaveBorder";
 import ZoomImage from "../../../shared/components/ZoomImage";
 
 const styles = (theme) => ({
@@ -65,9 +63,11 @@ const styles = (theme) => ({
     },
   },
   wrapper: {
-    position: "relative",
-    backgroundColor: theme.palette.secondary.main,
-    // backgroundColor: "#ffffff",
+    // position: "relative",
+    position: "fixed",
+    // backgroundColor: theme.palette.secondary.main,
+    // background color of home page
+    backgroundColor: "#4db6ac",
     paddingBottom: theme.spacing(2),
   },
   image: {
@@ -77,7 +77,7 @@ const styles = (theme) => ({
     boxShadow: theme.shadows[4],
   },
   container: {
-    marginTop: theme.spacing(6),
+    marginTop: theme.spacing(-7),
     marginBottom: theme.spacing(12),
     [theme.breakpoints.down("md")]: {
       marginBottom: theme.spacing(9),
@@ -100,7 +100,7 @@ const styles = (theme) => ({
 });
 
 function HeadSection(props) {
-  const { classes, theme, width } = props;
+  const { classes, width } = props;
   return (
     <Fragment>
       <div className={classNames("lg-p-top", classes.wrapper)}>
@@ -157,12 +157,7 @@ function HeadSection(props) {
           </Box>
         </div>
       </div>
-      {/* <WaveBorder
-        upperColor={theme.palette.secondary.main}
-        lowerColor="#FFFFFF"
-        className={classes.waveBorder}
-        animationNegativeDelay={2}
-      /> */}
+      
     </Fragment>
   );
 }

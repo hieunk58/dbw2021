@@ -1,23 +1,16 @@
 import React, { memo, useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
-// import AOS from "aos/dist/aos";
 import { withStyles } from "@material-ui/core";
 import NavBar from "./navigation/NavBar";
-// import Footer from "./footer/Footer";
-// import "aos/dist/aos.css";
-// import CookieRulesDialog from "./cookies/CookieRulesDialog";
-// import CookieConsent from "./cookies/CookieConsent";
-// import dummyBlogPosts from "../dummy_data/blogPosts";
 import DialogSelector from "./login/DialogSelector";
 import Routing from "./Routing";
 import SignIn from "./SignIn";
-// import smoothScrollTop from "../../shared/functions/smoothScrollTop";
-
-// AOS.init({ once: true });
+import HeadSection from "./home/HeadSection";
 
 const styles = (theme) => ({
   wrapper: {
-    backgroundColor: theme.palette.common.white,
+    // backgroundColor: theme.palette.common.black,
+    backgroundColor: "#80cbc4",
     overflowX: "hidden",
   },
 });
@@ -85,9 +78,12 @@ function Main(props) {
         handleMobileDrawerOpen={handleMobileDrawerOpen}
         handleMobileDrawerClose={handleMobileDrawerClose}
       />
-      <Routing
+      <HeadSection>
+
+      </HeadSection>
+      {/* <Routing
         selectHome={selectHome}
-      />
+      /> */}
       {/* <Copyright /> */}
     </div>
   );
