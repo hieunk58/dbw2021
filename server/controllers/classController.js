@@ -2,9 +2,9 @@ var Class = require('../models/class')
 var async = require('async')
 var User = require('../models/user') // user with role="student"
 var Subject = require('../models/subject')
-var Role = require('../models/role')
-
-// const { body,validationResult } = require("express-validator");
+var Test = require('../models/test')
+var Result = require('../models/result')
+var Enrollment = require('../models/enrollment')
 
 // Display list of all classes.
 exports.class_list = function (req, res, next) {
@@ -33,10 +33,7 @@ exports.class_detail = function (req, res, next) {
             Class.findById(req.params.id)
                 .exec(callback)
         },
-        // class_students: function (callback) {
-        //     User.find({ 'class': req.params.id, 'role': "student" })
-        //         .exec(callback)
-        // },
+
         class_subjects: function (callback) {
             Subject.find({ 'class': req.params.id })
                 .populate('teacher')
@@ -72,13 +69,13 @@ exports.class_update_post = function (req, res) {
             if (err) { 
                 res.status(500).send({
                     message:
-                      err.message || "Cannot update class."
+                      err.message || "Cannot update this class."
                 });
                 return;
             }
             if(!result) {
                 res.status(404).send({
-                message: `Cannot update class with id=${id}`
+                message: "Cannot update this class."
               });
             } else {
                 res.send({ message: "Class was updated successfully." });
@@ -88,16 +85,13 @@ exports.class_update_post = function (req, res) {
 
 exports.class_delete_post = function(req, res) {
     var id = req.params.id;
-    // var role = Role.findOne({ 'name': 'student'} );
-    // console.log("role: ", role);
+    // to delete a class:
+    // 1. delete subject(non-archived), test, test result
+    // 2. delete enrollment
     async.parallel({
         class: function(callback) {
             Class.findById(id).exec(callback);
         },
-        // find all students that have class id = deleted class id
-        // student_list: function(callback) {
-        //     User.find({ 'class': id, 'role': role});
-        // },
         subject_list: function(callback) {
             Subject.find({ 'class': id, "isArchived": false}).exec(callback);
         }
@@ -110,43 +104,61 @@ exports.class_delete_post = function(req, res) {
             });
             return;
         }
-        if(results.subject_list.length > 0) {
-            //delete subject if it is not archived and has no test
-            for(let i = 0; i < results.subject_list.length; ++i) {
-                Test.findOne({'subject': results.subject_list[i]._id})
-                    .exec(function(err, found_one) {
-                        if(err) {
-                            res.status(500).send({
-                                message:
-                                err.message || "Cannot delete class."
-                            });
-                            return;
-                        }
-                        if(!found_one) {
-                            // only delete subject that has no test
-                            Subject.findByIdAndRemove(results.subject_list[i]._id);
-                        }
-                    });
-            }
 
+        // 1. delete subject, test, test results
+        if(results.subject_list.length > 0) {
+            for(let i = 0; i < results.subject_list.length; ++i) {
+                // delete all test have subject id
+                console.log("delete subject.id: ", results.subject_list[i]._id);
+                console.log("delete subject.name: ", results.subject_list[i].subject_name);
+                Test.deleteMany({'subject': results.subject_list[i]._id})
+                .exec(function(err) {
+                    if(err) {
+                        res.status(500).send({
+                            message:
+                            err.message || "Cannot delete class."
+                        });
+                        return;
+                    }
+                });
+            
+                // delete all test results have subject id
+                Result.deleteMany({'subject': results.subject_list[i]._id})
+                .exec(function(err) {
+                    if(err) {
+                        res.status(500).send({
+                            message:
+                            err.message || "Cannot delete class."
+                        });
+                        return;
+                    }
+                });
+            }
         }
-        // // deassign student from this class, need to do this? or it automatically null
-        // for(let i = 0; i < results.student_list.length; ++i) {
-        //     results.student_list[i].class = null;
-        // }
+        // 2. delete enrollment
+        Enrollment.deleteMany({'class': id})
+        .exec(function(err) {
+            if(err) {
+                res.status(500).send({
+                    message:
+                    err.message || "Cannot delete class."
+                });
+                return;
+            }
+        });
 
         Class.findByIdAndRemove(id)
-            .exec(function (err) {
-                if (err) { 
-                    res.status(500).send({
-                        message:
-                        err.message || "Cannot delete class. Class not found"
-                    });
-                    return;
-                }
-                //TODO DELETE ENROLLMENT
-                res.send({ message: "Class was deleted successfully." });
-            });
+        .exec(function (err) {
+            if (err) { 
+                res.status(500).send({
+                    message:
+                    err.message || "Cannot delete class. Class not found"
+                });
+                return;
+            }
+            //TODO DELETE ENROLLMENT
+            res.send({ message: "Class was deleted successfully." });
+        });
     });
 };
 

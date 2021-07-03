@@ -214,8 +214,6 @@ function CustomTable(props) {
             >
               <IconButton
                 className={classes.iconButton}
-                width={50}
-                height={50}
                 onClick={() => {
                   exportToPdf()
                 }}

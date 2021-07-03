@@ -52,19 +52,6 @@ exports.subject_detail = function (req, res, next) {
         res.send({list_test: results.test_list, list_result: results.result_list});
     })
 };
-    // Subject.find()
-    //     .sort([['subject_name', 'ascending']])
-    //     .exec(function (err, list_subjects) {
-    //         if (err) { 
-    //             res.status(500).send({
-    //                 message:
-    //                   err.message || "Cannot retrieve subject list."
-    //               });
-    //             return;
-    //         }
-    //         // Successful
-    //         res.send({subject_list: list_subjects });
-    //     })
 
 // Handle subject update name and assigned teacher on POST.
 exports.subject_update_post = function (req, res) {
