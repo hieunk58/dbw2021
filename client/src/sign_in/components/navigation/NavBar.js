@@ -1,4 +1,4 @@
-import React, { Fragment, useRef } from "react";
+import React, { Fragment, useEffect, useRef, useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import classNames from "classnames";
@@ -136,100 +136,13 @@ const styles = (theme) => ({
 });
 
 function NavBar(props) {
-  const { selectedTab, messages, classes, width, currentUser } = props;
+  const { selectedTab, classes, currentUser } = props;
   // Will be use to make website more accessible by screen readers
   const links = useRef([]);
+  const [menuItems, setMenuItems] = useState([]);
   
   // Menu items on left navigation bar: Dashboard, Logout, etc
-  const menuItems = [
-    // if(currentUser.role.name === "admin") {
-
-    // } else if(currentUser.role.name === "teacher") {
-
-    // } else {
-
-    // }
-    {
-      link: "/c/users",
-      name: "Users",
-      icon: {
-        desktop: (
-          <DashboardIcon
-            className={
-              selectedTab === "Users" ? classes.textSelected : "text-white"
-            }
-            fontSize="small"
-          />
-        ),
-        mobile: <DashboardIcon className="text-white" />,
-      },
-    },
-    {
-      link: "/c/classes",
-      name: "Classes",
-      icon: {
-        desktop: (
-          <ClassIcon
-            className={
-              selectedTab === "Classes" ? classes.textSelected : "text-white"
-            }
-            fontSize="small"
-          />
-        ),
-        mobile: <ClassIcon className="text-white" />,
-      },
-    },
-    {
-      link: "/c/subjects",
-      name: "Subjects",
-      icon: {
-        desktop: (
-          <SubjectIcon
-            className={
-              selectedTab === "Subjects"
-                ? classes.textSelected
-                : "text-white"
-            }
-            fontSize="small"
-          />
-        ),
-        mobile: <SubjectIcon className="text-white" />,
-      },
-    },
-    {
-      link: "/c/student",
-      name: "Student View",
-      icon: {
-        desktop: (
-          <SubjectIcon
-            className={
-              selectedTab === "Student"
-                ? classes.textSelected
-                : "text-white"
-            }
-            fontSize="small"
-          />
-        ),
-        mobile: <SubjectIcon className="text-white" />,
-      },
-    },
-    {
-      link: "/c/teacher",
-      name: "Teacher View",
-      icon: {
-        desktop: (
-          <SubjectIcon
-            className={
-              selectedTab === "Teacher"
-                ? classes.textSelected
-                : "text-white"
-            }
-            fontSize="small"
-          />
-        ),
-        mobile: <SubjectIcon className="text-white" />,
-      },
-    },
+  var tempItems = [
     {
       link: "/",
       name: "Logout",
@@ -239,8 +152,107 @@ function NavBar(props) {
         ),
         mobile: <PowerSettingsNewIcon className="text-white" />,
       },
-    },
+    }
   ];
+
+  const calMenuItems = useCallback(() => {
+    console.log("calMenuItems() role: ", currentUser.role);
+    if(currentUser.role === "admin") {
+      console.log("role is admin");
+      var adminNavBar = [
+      {
+        link: "/c/users",
+        name: "Users",
+        icon: {
+          desktop: (
+            <DashboardIcon
+              className={
+                selectedTab === "Users" ? classes.textSelected : "text-white"
+              }
+              fontSize="small"
+            />
+          ),
+          mobile: <DashboardIcon className="text-white" />,
+        },
+      },
+      {
+        link: "/c/classes",
+        name: "Classes",
+        icon: {
+          desktop: (
+            <ClassIcon
+              className={
+                selectedTab === "Classes" ? classes.textSelected : "text-white"
+              }
+              fontSize="small"
+            />
+          ),
+          mobile: <ClassIcon className="text-white" />,
+        },
+      },
+      {
+        link: "/",
+        name: "Logout",
+        icon: {
+          desktop: (
+            <PowerSettingsNewIcon className="text-white" fontSize="small" />
+          ),
+          mobile: <PowerSettingsNewIcon className="text-white" />,
+        },
+      }
+    ]
+    // setMenuItems(adminNavBar.concat(tempItems));
+    setMenuItems(adminNavBar);
+
+    } else if(currentUser.role === "teacher") {
+      var teacherNavBar = [
+        {
+          link: "/c/teacher",
+          name: "Teacher View",
+          icon: {
+            desktop: (
+              <SubjectIcon
+                className={
+                  selectedTab === "Teacher"
+                    ? classes.textSelected
+                    : "text-white"
+                }
+                fontSize="small"
+              />
+            ),
+            mobile: <SubjectIcon className="text-white" />,
+          },
+        }
+      ] 
+      setMenuItems(teacherNavBar.concat(tempItems));
+    } else {
+      var studentNavBar = [
+        {
+          link: "/c/student",
+          name: "Student View",
+          icon: {
+            desktop: (
+              <SubjectIcon
+                className={
+                  selectedTab === "Student"
+                    ? classes.textSelected
+                    : "text-white"
+                }
+                fontSize="small"
+              />
+            ),
+            mobile: <SubjectIcon className="text-white" />,
+          },
+        }
+      ]
+      setMenuItems(studentNavBar.concat(tempItems));
+    }
+  }, [selectedTab]);
+
+  useEffect(() => {
+    calMenuItems();
+  }, [calMenuItems, currentUser])
+
   return (
     <Fragment>
       <AppBar position="sticky" className={classes.appBar}>

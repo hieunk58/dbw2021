@@ -295,18 +295,14 @@
     );
 
     useEffect(() => {
-      // selectClass(); // selected tab (pink color)
-      //fetchClassList();
+      selectClass(); // selected tab (pink color)
       fetchSubjectList();
-      // fetchTeacherList();
-    }, [fetchSubjectList, isManageSubjectPageOpen]);
+    }, [fetchSubjectList, isManageSubjectPageOpen, selectClass]);
 
     useEffect(() => {
-      selectClass(); // selected tab (pink color)
       fetchClassList();
-      // fetchSubjectList();
       fetchTeacherList();
-    }, [fetchClassList, fetchTeacherList, selectClass]);
+    }, [fetchClassList, fetchTeacherList]);
 
     // Open manage student page
     if(isManageStudentPageOpen)

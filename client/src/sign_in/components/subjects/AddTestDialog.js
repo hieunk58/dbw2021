@@ -59,7 +59,7 @@ const AddTestDialog = withTheme(function (props) {
         setTestDate('');
         return;
       })
-  }, [testName, testDate, currentSubject._id, pushMessageToSnackbar, onSuccess, onClose]);
+  }, [testName, testDate, pushMessageToSnackbar, onSuccess, onClose]);
 
   return (
     <FormDialog

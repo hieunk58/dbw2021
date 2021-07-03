@@ -104,6 +104,10 @@ class DataService {
         console.log("delete test with id: ", id);
         return api.post(`/test/${id}/delete`);
     }
+    getTestDetail(id) { 
+        console.log("getTestDetail id: ", id);
+        return api.get(`/test/${id}`); 
+    }
 
     // test result
     getTestResultList() {
@@ -114,6 +118,10 @@ class DataService {
     }
     updateTestResult(id, data) {
         return api.post(`/result/${id}/update`, data);
+    }
+    deleteTestResult(id) {
+        console.log("delete test result with id: ", id);
+        return api.post(`/result/${id}/delete`);
     }
 }
 

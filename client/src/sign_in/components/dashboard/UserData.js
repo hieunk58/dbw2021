@@ -156,9 +156,13 @@ function CustomTable(props) {
         }, 1000);
       })
       .catch(error => {
-        pushMessageToSnackbar({
-          text: error.response.data.message,
-        });
+        setTimeout(() => {
+          pushMessageToSnackbar({
+            text: error.response.data.message,
+          });
+          setIsDeleteTargetDialogOpen(false);
+          setIsDeleteTargetLoading(false);
+        }, 1500)
       });
   }, [deleteTargetDialogRow, targets, setTargets, pushMessageToSnackbar, fetchUserList]);
 

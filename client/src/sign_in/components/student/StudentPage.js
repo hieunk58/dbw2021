@@ -73,7 +73,7 @@ const rowsPerPage = 25;
 
 function CustomTable(props) {
   // const location = useLocation();
-  const { classes, currentUser, studyingClass, subjectList, testResultList } = props;
+  const { classes, selectStudentPage, currentUser, studyingClass, subjectList, testResultList } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
@@ -89,10 +89,15 @@ function CustomTable(props) {
 
   const [open, setOpen] = useState(false);
 
+  function calculateAvgResult() {
+
+  }
+
   const getTestResultBySubject = useCallback((subjectId) => {
     var results = [];
     for(let i = 0; i < testResultList.length; ++i) {
       console.log("testResultList.subject: ", testResultList[i].subject);
+      console.log("testResultList.test: ", testResultList[i].test.test_name);
       if(testResultList[i].subject === subjectId) {
         results.push(testResultList[i]);
       }
@@ -162,6 +167,9 @@ function CustomTable(props) {
   // const closeManageTestPage = useCallback(() => {
   //   setIsManageTestPageOpen(false);
   // }, [setIsManageTestPageOpen]);
+  useEffect(() => {
+    selectStudentPage();
+  }, [selectStudentPage]);
 
 
   return (
@@ -270,7 +278,7 @@ CustomTable.propTypes = {
   currentUser: PropTypes.object.isRequired,
   studyingClass: PropTypes.object.isRequired,
   subjectList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  // setSubjectListByTeacher: PropTypes.func.isRequired,
+  selectStudentPage: PropTypes.func.isRequired,
   pushMessageToSnackbar: PropTypes.func.isRequired
 };
 

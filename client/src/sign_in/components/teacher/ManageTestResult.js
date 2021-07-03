@@ -17,7 +17,6 @@ import {
   Tooltip
 } from "@material-ui/core";
 
-import AssessmentIcon from '@material-ui/icons/Assessment';
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
@@ -26,9 +25,8 @@ import stableSort from "../../../shared/functions/stableSort";
 import getSorting from "../../../shared/functions/getSorting";
 import HighlightedInformation from "../../../shared/components/HighlightedInformation";
 import ConfirmationDialog from "../../../shared/components/ConfirmationDialog";
-import AddTestDialog from "./AddTestDialog";
-import EditTestDialog from "./EditTestDialog";
-import ManageTestResult from "./ManageTestResult";
+import AddTestResultDialog from "./AddTestResultDialog";
+import EditTestResultDialog from "./EditTestResultDialog";
 // import AddSubjectDialog from "./AddSubjectDialog";
 import DataService from "../../../services/data.service";
 
@@ -71,21 +69,22 @@ const styles = (theme) => ({
 
 const rows = [
   { id: "icon", numeric: true, label: "", },
-  { id: "name", numeric: false, label: "Name", },
-  { id: "date", numeric: false, label: "Date", },
+  { id: "test", numeric: false, label: "Test name", },
+  { id: "name", numeric: false, label: "Student name", },
+  { id: "score", numeric: false, label: "Grade", },
   { id: "actions", numeric: false, label: "", },
 ];
 
 const rowsPerPage = 25;
 
-function ManageTest(props) {
+function ManageTestResult(props) {
   const editForm = useRef();
 
-  const { pushMessageToSnackbar, classes, onClose, open, studentList, currentSubject } = props;
+  const { pushMessageToSnackbar, classes, onClose, onSuccess,
+    studentList, currentSubject, currentTest } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
-  const [testList, setTestList] = useState([]);
   const [testResultList, setTestResultList] = useState([]);
 
   const [isDeleteTargetDialogOpen, setIsDeleteTargetDialogOpen] = useState(
@@ -95,12 +94,26 @@ function ManageTest(props) {
   const [isDeleteTargetLoading, setIsDeleteTargetLoading] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isManageTestResultPageOpen, setIsManageTestResultPageOpen] = useState(false);
-  const [currentSelectedTest, setCurrentSelectedTest] = useState(false);
-
 
   // const [open, setOpen] = useState(false);
-  // const fetchTestListBySubject
+  // const fetchTestResultListByTestId
+
+  const fetchTestResultListByTestId = useCallback(() => {
+    // get test list by subject id
+    console.log(" fetchTestResultListByTestId id: ", currentTest);
+    DataService.getTestDetail(currentTest._id)
+    .then((res) => {
+      // console.log("test list by subject: ", res.data);
+      setTestResultList(res.data.list_result);
+    })
+    .catch((error) => {
+      console.log("error: ", error.response.data.message);
+      pushMessageToSnackbar({
+        text: error.response.data.message,
+      });
+    })
+
+  }, [currentTest, pushMessageToSnackbar]);
 
   const handleRequestSort = useCallback(
     (__, property) => {
@@ -115,74 +128,43 @@ function ManageTest(props) {
     [setOrder, setOrderBy, order, orderBy]
   );
 
-  // used to show list of test
-  const fetchTestListBySubject = useCallback(() => {
-    // get test list by subject id
-    console.log(" fetchTestListBySubject id: ", currentSubject);
-    DataService.getSubjectDetail(currentSubject._id)
-    .then((res) => {
-      // console.log("test list by subject: ", res.data);
-      setTestList(res.data.list_test);
-    })
-    .catch((error) => {
-      console.log("error: ", error.response.data.message);
-      pushMessageToSnackbar({
-        text: error.response.data.message,
-      });
-    })
-
-  }, [currentSubject, pushMessageToSnackbar]);
-
-  const fetchTestResultListByTestId = useCallback((currentSelectedTest) => {
-    // get test list by subject id
-    console.log(" fetchTestResultListByTestId id: ", currentSelectedTest);
-    DataService.getTestDetail(currentSelectedTest._id)
-    .then((res) => {
-      console.log("test result list by test id: ", res.data);
-      setTestResultList(res.data.list_result);
-    })
-    .catch((error) => {
-      console.log("error: ", error.response.data.message);
-      pushMessageToSnackbar({
-        text: error.response.data.message,
-      });
-    })
-
-  }, [setTestResultList, pushMessageToSnackbar]);
-
   const deleteTarget = useCallback(() => {
     setIsDeleteTargetLoading(true);
-    DataService.deleteTest(deleteTargetDialogRow._id)
+    DataService.deleteTestResult(deleteTargetDialogRow._id)
       .then(() => {
         setTimeout(() => {
           setIsDeleteTargetDialogOpen(false);
           setIsDeleteTargetLoading(false);
-          const _testList = [...testList];
-          const index = _testList.findIndex(
+          const _testResultList = [...testResultList];
+          const index = _testResultList.findIndex(
             (element) => element.id === deleteTargetDialogRow.id
           );
-          _testList.splice(index, 1);
-          setTestList(_testList);
+          _testResultList.splice(index, 1);
+          setTestResultList(_testResultList);
           pushMessageToSnackbar({
-            text: "Test has been removed",
+            text: "Test result has been removed",
           });
           // todo fetch test list after remove
-          fetchTestListBySubject();
+          fetchTestResultListByTestId();
         }, 1500);
       })
       .catch(error => {
-        pushMessageToSnackbar({
-          text: error.response.data.message,
-        });
+        setTimeout(() => {
+            pushMessageToSnackbar({
+              text: error.response.data.message,
+            });
+            setIsDeleteTargetDialogOpen(false);
+            setIsDeleteTargetLoading(false);
+        }, 1500)
       });
   }, [
     setIsDeleteTargetDialogOpen,
     setIsDeleteTargetLoading,
     pushMessageToSnackbar,
-    // setTestList,
-    fetchTestListBySubject,
+    setTestResultList,
+    fetchTestResultListByTestId,
     deleteTargetDialogRow,
-    testList,
+    testResultList,
   ]);
 
   const handleChangePage = useCallback(
@@ -195,12 +177,6 @@ function ManageTest(props) {
   const handleDeleteTargetDialogClose = useCallback(() => {
     setIsDeleteTargetDialogOpen(false);
   }, [setIsDeleteTargetDialogOpen]);
-  const handleAddDialogClose = useCallback(() => {
-    setIsAddDialogOpen(false);
-  }, [setIsAddDialogOpen]);
-  const handleAddDialogOpen = useCallback(() => {
-    setIsAddDialogOpen(true);
-  }, [setIsAddDialogOpen]);
 
   const handleDeleteTargetDialogOpen = useCallback(
     (row) => {
@@ -210,120 +186,79 @@ function ManageTest(props) {
     [setIsDeleteTargetDialogOpen, setDeleteTargetDialogRow]
   );
 
+  // add dialog
+  const handleAddDialogClose = useCallback(() => {
+    setIsAddDialogOpen(false);
+  }, [setIsAddDialogOpen]);
+  const handleAddDialogOpen = useCallback(() => {
+    setIsAddDialogOpen(true);
+  }, [setIsAddDialogOpen]);
+  // edit dialog
   const handleEditDialogClose = useCallback(() => {
     setIsEditDialogOpen(false);
   }, [setIsEditDialogOpen]);
 
   const handleEditDialogOpen = useCallback(
     (row) => {
-      // fetchTestListBySubject()
+      // fetchTestResultListByTestId()
       console.log("edit data: ", row);
       editForm.current.mapEditData(row);
-      // editForm.current.mapEditData(row);
       setIsEditDialogOpen(true);
     },
     [setIsEditDialogOpen]
   );
 
   const handleCreateTestSuccess = useCallback(() => {
-    fetchTestListBySubject();
+    fetchTestResultListByTestId();
 
-  }, [fetchTestListBySubject]);
-  
-  function formatDate(date) {
-    var d = new Date(date),
-        month = '' + (d.getMonth() + 1),
-        day = '' + d.getDate(),
-        year = d.getFullYear();
-
-    if (month.length < 2) 
-        month = '0' + month;
-    if (day.length < 2) 
-        day = '0' + day;
-
-    return [day, month, year].join('.');
-}
-
-const openManageTestResultPage = useCallback((row) => {
-  console.log("get test result by test id: ", row._id);
-  setCurrentSelectedTest(row);
-  fetchTestResultListByTestId(row);
-  setIsManageTestResultPageOpen(true);
-}, [setCurrentSelectedTest, fetchTestResultListByTestId, setIsManageTestResultPageOpen]);
-
-const handleManageTestResultPageClose = useCallback(() => {
-  setIsManageTestResultPageOpen(false);
-}, [setIsManageTestResultPageOpen]);
+  }, [fetchTestResultListByTestId]);
 
 
   useEffect(() => {
-      console.log('open is true, get test list');
-      fetchTestListBySubject();
-    // }
-  }, [fetchTestListBySubject, open]);
+      fetchTestResultListByTestId();
+  }, [fetchTestResultListByTestId]);
 
-  if(isManageTestResultPageOpen)
-    {
-      return <ManageTestResult
-          studentList={studentList}
-          // testResultList={testResultList}
-          currentSubject={currentSubject}
-          currentTest={currentSelectedTest}
-          // onSuccess={}
-          // onSuccess={fetchTestResultListByTestId(currentSelectedTest)}
-          onClose={handleManageTestResultPageClose}
-          pushMessageToSnackbar={pushMessageToSnackbar}
-        />
-    }
-  
   return (
     <Paper>
       <Toolbar className={classes.toolbar}>
-        <Typography variant="h6">Test List</Typography>
-        <Box mr={1}>
-            <Button onClick={onClose}>
-            Back
-            </Button>
-        </Box>
-        {/* <Button 
+        <Typography variant="h6">Test Result</Typography>
+        <Button 
           variant="contained"
           color="primary"
           onClick={onClose}
           disableElevation
         >
           Back
-        </Button> */}
+        </Button>
         <Button
           variant="contained"
           color="secondary"
           onClick={handleAddDialogOpen}
           disableElevation
         >
-          Add New Test
+          Add Test Result
         </Button>
       </Toolbar>
-      
-      <AddTestDialog 
+      <AddTestResultDialog
         open={isAddDialogOpen}
         onClose={handleAddDialogClose}
-        // testList={testList}
-        // teacherList={teacherList}
-        // currentClass={currentClass}
-        currentSubject={currentSubject}
+        studentList={studentList}
         onSuccess={handleCreateTestSuccess}
+        currentSubject={currentSubject}
+        currentTest={currentTest}
         pushMessageToSnackbar={pushMessageToSnackbar}
       >
-      </AddTestDialog>
-
-      <EditTestDialog
+      </AddTestResultDialog>
+      <EditTestResultDialog
         ref={editForm}
         open={isEditDialogOpen}
-        onSuccess={handleCreateTestSuccess}
+        currentSubject={currentSubject}
+        currentTest={currentTest}
         onClose={handleEditDialogClose}
+        onSuccess={handleCreateTestSuccess}
         pushMessageToSnackbar={pushMessageToSnackbar}
       >
-      </EditTestDialog>
-
+      </EditTestResultDialog>
       <Divider />
       <ConfirmationDialog
         open={isDeleteTargetDialogOpen}
@@ -332,9 +267,9 @@ const handleManageTestResultPageClose = useCallback(() => {
         content={
           deleteTargetDialogRow ? (
             <span>
-              {"Do you really want to remove this test "}
+              {"Do you really want to remove this test result "}
               <b>{deleteTargetDialogRow.test_name}</b>
-              {" from the class?"}
+              {" from the list?"}
             </span>
           ) : null
         }
@@ -344,17 +279,17 @@ const handleManageTestResultPageClose = useCallback(() => {
       />
       <Box width="100%">
         <div className={classes.tableWrapper}>
-          {testList.length > 0 ? (
+          {testResultList.length > 0 ? (
             <Table aria-labelledby="tableTitle">
               <EnhancedTableHead
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
-                rowCount={testList.length}
+                rowCount={testResultList.length}
                 rows={rows}
               />
               <TableBody>
-                {stableSort(testList, getSorting(order, orderBy))
+                {stableSort(testResultList, getSorting(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => (
                     <TableRow hover tabIndex={-1} key={index}>
@@ -370,28 +305,17 @@ const handleManageTestResultPageClose = useCallback(() => {
                         </IconButton>
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.test_name}
+                        {currentTest.test_name}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {formatDate(row.test_date)}
+                        {row.student.first_name + " " + row.student.family_name}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {row.score}
                       </TableCell>
                       
                       <TableCell component="th" scope="row">
                         <Box display="flex" justifyContent="flex-end">
-                          <Tooltip
-                            title="Manage results"
-                            placement="top"
-                          >
-                            <IconButton
-                              className={classes.iconButton}
-                              onClick={() => {
-                                openManageTestResultPage(row);
-                              }}
-                              aria-label="Test Result"
-                            >
-                              <AssessmentIcon className={classes.blackIcon} />
-                            </IconButton>
-                          </Tooltip>
                           <IconButton
                             className={classes.iconButton}
                             onClick={() => {
@@ -420,7 +344,7 @@ const handleManageTestResultPageClose = useCallback(() => {
           ) : (
             <Box m={2}>
               <HighlightedInformation>
-                There is not any tests yet.
+                There is not any results yet.
               </HighlightedInformation>
             </Box>
           )}
@@ -428,7 +352,7 @@ const handleManageTestResultPageClose = useCallback(() => {
         <div className={classes.alignRight}>
           <TablePagination
             component="div"
-            count={testList.length}
+            count={testResultList.length}
             rowsPerPage={rowsPerPage}
             page={page}
             backIconButtonProps={{
@@ -441,8 +365,8 @@ const handleManageTestResultPageClose = useCallback(() => {
             classes={{
               select: classes.dNone,
               selectIcon: classes.dNone,
-              actions: testList.length > 0 ? classes.dBlock : classes.dNone,
-              caption: testList.length > 0 ? classes.dBlock : classes.dNone,
+              actions: testResultList.length > 0 ? classes.dBlock : classes.dNone,
+              caption: testResultList.length > 0 ? classes.dBlock : classes.dNone,
             }}
             labelRowsPerPage=""
           />
@@ -452,15 +376,16 @@ const handleManageTestResultPageClose = useCallback(() => {
   );
 }
 
-ManageTest.propTypes = {
+ManageTestResult.propTypes = {
   classes: PropTypes.object.isRequired,
   currentSubject: PropTypes.object.isRequired,
   pushMessageToSnackbar: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired,
   onClose: PropTypes.func,
-  testList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  testResultList: PropTypes.arrayOf(PropTypes.object).isRequired,
   teacherList: PropTypes.arrayOf(PropTypes.object).isRequired,
   setTestList: PropTypes.func.isRequired,
   setTeacherList: PropTypes.func.isRequired
 };
 
-export default withStyles(styles, { withTheme: true })(ManageTest);
+export default withStyles(styles, { withTheme: true })(ManageTestResult);

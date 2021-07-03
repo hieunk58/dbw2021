@@ -72,7 +72,7 @@ const rowsPerPage = 25;
 
 function CustomTable(props) {
   // const location = useLocation();
-  const { classes, currentUser, pushMessageToSnackbar, subjectListByTeacher } = props;
+  const { classes, selectTeacherPage, currentUser, pushMessageToSnackbar, subjectListByTeacher } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
@@ -84,20 +84,9 @@ function CustomTable(props) {
   // const [testList, setTestList] = useState([]);
   // extract test by subject id from test list
   const [testListBySubject, setTestListBySubject] = useState([]);
+  const [testResultListBySubject, setTestResultListBySubject] = useState([]);
   // const [subjectListByTeacher, setSubjectListByTeacher] = useState([]);
-
-
-
-
-  // const [open, setOpen] = useState(false);
-
-  // const handleClickOpen = () => {
-  //   setOpen(true);
-  // };
-
-  // const handleClose = () => {
-  //   setOpen(false);
-  // };
+  const [studentListBySubject, setStudentListBySubject] = useState([]);
 
   const handleRequestSort = useCallback(
     (__, property) => {
@@ -119,65 +108,54 @@ function CustomTable(props) {
     [setPage]
   );
 
-
-  // async function fetchTestListBySubject(currentSubject) {
-  //   return await DataService.getSubjectDetail(currentSubject._id);
-  // }
   const fetchTestListBySubject = useCallback((currentSubject) => {
     // get test list by subject id
     console.log(" fetchTestListBySubject id: ", currentSubject);
     DataService.getSubjectDetail(currentSubject._id)
     .then((res) => {
       console.log("test list by subject: ", res.data.list_test);
+      console.log("test result list by subject: ", res.data.list_result);
       setTestListBySubject(res.data.list_test);
+      setTestResultListBySubject(res.data.list_result);
     })
     .catch((error) => {
-      console.log("error: ", error.response.data.message);
       pushMessageToSnackbar({
         text: error.response.data.message,
       });
     })
-    // return await response;
   }, [pushMessageToSnackbar]);
+
+  const fetchStudentListBySubject = useCallback((subject) => {
+    // get student list by subject with class id
+    console.log("selected subject: ", subject);
+    console.log("fetchStudentListBySubject with class id: ", subject.class._id);
+    DataService.getEnrollmentList()
+      .then(res => {
+        console.log("enrollment list: ", res.data.list);
+        var students = [];
+        var list = res.data.list;
+        for(let i = 0 ; i < list.length; ++i) {
+          if(list[i].class === subject.class._id) {
+            console.log("enrollment class: ", list[i].class);
+            students.push(list[i].student);
+          }
+        }
+        //
+        setStudentListBySubject(students);
+      });
+  }, []);
 
   const openManageTestPage = useCallback((row) => {
     setCurrentSelectedSubject(row);
     console.log("get test list by subject id: ", row._id);
     // fetchTestListBySubject(row)
+    fetchStudentListBySubject(row);
     setIsManageTestPageOpen(true);
-  }, []);
+  }, [fetchStudentListBySubject]);
 
   const closeManageTestPage = useCallback(() => {
     setIsManageTestPageOpen(false);
   }, [setIsManageTestPageOpen]);
-
-  // const fetchRandomTests = useCallback(() => {
-  //   DataService.getTestList()
-  //     .then(res => {
-  //       console.log("[Main.js] get test list using api: ", res.data);
-  //       setTestList(res.data.test_list);
-  //     });
-
-  // }, [setTestList]);
-
-  // const fetchRandomSubjects = useCallback((currentUser) => {
-  //   DataService.getSubjectList()
-  //     .then(res => {
-  //       console.log("[Main.js] get subject list using api: ", res.data);
-  //       //setSubjectList(res.data.subject_list);
-  //       // filter subject by current signed in teacher
-  //       // for student just filter with class id
-  //       const subjectList = res.data.subject_list;
-  //       const subjects = [];
-  //       for(let i = 0; i < subjectList.length; ++i) {
-  //         if(subjectList[i].teacher === currentUser.id) {
-  //           subjects.push(subjectList[i]);
-  //         }
-  //       }
-  //       setSubjectListByTeacher(subjects);
-  //     });
-
-  // }, [setSubjectListByTeacher]);
 
   // useEffect(() => {
   //   console.log('teacher page');
@@ -195,12 +173,9 @@ function CustomTable(props) {
   //   fetchRandomTests();
 
   // }, [fetchRandomSubjects, fetchRandomTests, location]);
-  // useEffect(() => {
-  //   // if(open === true) {
-  //     console.log('open is true, get test list');
-  //     fetchTestListBySubject();
-  //   // }
-  // }, [fetchTestListBySubject, isManageTestPageOpen]);
+  useEffect(() => {
+    selectTeacherPage();
+  }, [selectTeacherPage]);
 
   // Open manage subject page
   if(isManageTestPageOpen)
@@ -208,12 +183,10 @@ function CustomTable(props) {
     return <ManageTest
         open={isManageTestPageOpen}
         testList={testListBySubject}
+        // testResultList={testResultListBySubject}
         onSuccess={fetchTestListBySubject}
-        // subjectList={subjectList}
-        // setSubjectList={setSubjectByClass}
-        // teacherList={teacherList}
+        studentList={studentListBySubject}
         currentSubject={currentSelectedSubject}
-        // setTeacherList={setTeacherList}
         pushMessageToSnackbar={pushMessageToSnackbar}
         onClose={closeManageTestPage}
       />
@@ -265,6 +238,7 @@ function CustomTable(props) {
                             <IconButton
                               className={classes.iconButton}
                               onClick={() => {
+                                console.log("select subject: ", row);
                                 openManageTestPage(row)
                               }}
                               aria-label="Manage test"
@@ -332,6 +306,7 @@ CustomTable.propTypes = {
   currentUser: PropTypes.object.isRequired,
   subjectListByTeacher: PropTypes.arrayOf(PropTypes.object).isRequired,
   setSubjectListByTeacher: PropTypes.func.isRequired,
+  selectTeacherPage: PropTypes.func.isRequired,
   pushMessageToSnackbar: PropTypes.func.isRequired
 };
 

@@ -77,6 +77,18 @@ const EditUserDialog = withTheme(forwardRef(function (props, ref) {
       }}
       content={
         <Fragment>
+          <TextField
+              size="small"
+              margin="normal"
+              required
+              fullWidth
+              label="Firstname"
+              variant="outlined"
+              value={firstname}
+              onChange={event => {
+                  setFirstname(event.target.value);
+              }}
+          />
             <TextField
                 size="small"
                 variant="outlined"
@@ -87,18 +99,6 @@ const EditUserDialog = withTheme(forwardRef(function (props, ref) {
                 value={surname}
                 onChange={event => {
                     setSurname(event.target.value);
-                }}
-            />
-            <TextField
-                size="small"
-                margin="normal"
-                required
-                fullWidth
-                label="Firstname"
-                variant="outlined"
-                value={firstname}
-                onChange={event => {
-                    setFirstname(event.target.value);
                 }}
             />
 

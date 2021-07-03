@@ -176,6 +176,20 @@ function Main(props) {
   }, [
     setSelectedTab,
   ]);
+  const selectStudentPage = useCallback(() => {
+    document.title = "TU Chemnitz - Student View";
+    setSelectedTab("Student");
+    
+  }, [
+    setSelectedTab,
+  ]);
+  const selectTeacherPage = useCallback(() => {
+    document.title = "TU Chemnitz - Teacher View";
+    setSelectedTab("Teacher");
+    
+  }, [
+    setSelectedTab,
+  ]);
 
   const getPushMessageFromChild = useCallback(
     (pushMessage) => {
@@ -191,7 +205,7 @@ function Main(props) {
         var studyingClass = "";
         var list = res.data.list;
         for(let i = 0 ; i < list.length; ++i) {
-          if(list[i].student === userId) {
+          if(list[i].student._id === userId) {
               studyingClass = list[i].class;
               console.log("detect studying class: ", studyingClass)
           }
@@ -278,6 +292,8 @@ function Main(props) {
             selectDashboard={selectDashboard}
             selectClass={selectClass}
             selectSubject={selectSubject}
+            selectStudentPage={selectStudentPage}
+            selectTeacherPage={selectTeacherPage}
             currentUser={currentUser}
 
 

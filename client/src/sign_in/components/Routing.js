@@ -56,6 +56,8 @@ function Routing(props) {
     setClassList,
     selectDashboard,
     selectClass,
+    selectStudentPage,
+    selectTeacherPage,
     selectSubject,
     teacherList,
     setTeacherList,
@@ -110,6 +112,7 @@ function Routing(props) {
           // path="/profile/student"
           path="/c/student"
           component={StudentPage}
+          selectStudentPage={selectStudentPage}
           currentUser={currentUser}
           studyingClass={studyingClass}
           testResultList={testResultList}
@@ -120,6 +123,7 @@ function Routing(props) {
           path="/c/teacher"
           component={TeacherPage}
           currentUser={currentUser}
+          selectTeacherPage={selectTeacherPage}
           pushMessageToSnackbar={pushMessageToSnackbar}
           subjectListByTeacher={subjectListByTeacher}
           // setSubjectListByTeacher={setSubjectListByTeacher}
@@ -139,13 +143,15 @@ Routing.propTypes = {
   setTargets: PropTypes.func.isRequired,
   subjectList: PropTypes.arrayOf(PropTypes.object).isRequired,
   teacherList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  setTeacherList: PropTypes.func.isRequired,
+  // setTeacherList: PropTypes.func.isRequired,
   setSubjectList: PropTypes.func.isRequired,
   classList: PropTypes.arrayOf(PropTypes.object).isRequired,
   setClassList: PropTypes.func.isRequired,
   selectDashboard: PropTypes.func.isRequired,
   selectClass: PropTypes.func.isRequired,
   selectSubject: PropTypes.func.isRequired,
+  selectTeacherPage: PropTypes.func.isRequired,
+  selectStudentPage: PropTypes.func.isRequired,
   studentList: PropTypes.arrayOf(PropTypes.object).isRequired,
   setStudentList: PropTypes.func.isRequired,
   
