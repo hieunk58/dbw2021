@@ -21,16 +21,8 @@ import {
 } from "@material-ui/core";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import ClassIcon from "@material-ui/icons/Class";
-// import SubjectIcon from "@material-ui/icons/Subject";
 import MessageRoundedIcon from '@material-ui/icons/MessageRounded';
-// import ImageIcon from "@material-ui/icons/Image";
 import PowerSettingsNewIcon from "@material-ui/icons/PowerSettingsNew";
-// import MenuIcon from "@material-ui/icons/Menu";
-// import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
-// import MessagePopperButton from "./MessagePopperButton";
-// import SideDrawer from "./SideDrawer";
-// import Balance from "./Balance";
-// import NavigationDrawer from "../../../shared/components/NavigationDrawer";
 
 const styles = (theme) => ({
   appBar: {

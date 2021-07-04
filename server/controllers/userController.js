@@ -48,7 +48,6 @@ exports.user_create_post = (req, res) => {
       family_name: req.body.family_name,
       username: req.body.username,
       password: bcrypt.hashSync(req.body.password, 8),
-    //   class: null
     });
   
     user.save((err, user) => {

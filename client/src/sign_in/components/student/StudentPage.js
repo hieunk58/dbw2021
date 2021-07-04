@@ -94,7 +94,16 @@ function CustomTable(props) {
   const [open, setOpen] = useState(false);
 
   function calculateAvgResult() {
-
+    // call this in useEffect
+    var results = [];
+    for(let i = 0; i < testResultList.length; ++i) {
+      if(testResultList[i].student === currentUser.id) {
+        // this test result belongs to current signed in student
+        results.push(testResultList[i]);
+      }
+    }
+    // target list: [{subject, avgGrade}]
+    
   }
 
   const getTestResultBySubject = useCallback((subjectId) => {
@@ -118,10 +127,6 @@ function CustomTable(props) {
   const handleClose = () => {
     setOpen(false);
   };
-
-  // first get all test result
-  // get test result with subject id, currentUser._id
-
 
   const handleRequestSort = useCallback(
     (__, property) => {
@@ -155,7 +160,8 @@ function CustomTable(props) {
     const title = "My Result";
     const headers = [["SUBJECT NAME", "GRADE"]];
 
-    const data = subjectList.map(elem => [elem.subject_name, elem.class.class_name]); //todo show avg grade
+    //const data = subjectList.map(elem => [elem.subject_name, elem.class.class_name]); //todo show avg grade
+    const data = subjectList.map(elem => [elem.subject_name, 1]); //todo show avg grade
 
     let content = {
       startY: 50,

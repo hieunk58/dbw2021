@@ -95,7 +95,6 @@ exports.class_delete_post = function(req, res) {
         subject_list: function(callback) {
             Subject.find({ 'class': id, "isArchived": false}).exec(callback);
         }
-        // TODO delete subjects
     }, function(err, results) {
         if(err) {
             res.status(500).send({

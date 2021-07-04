@@ -24,38 +24,59 @@ exports.result_list = function (req, res, next) {
 exports.student_result_list = function (req, res, next) {
     var student_id = req.body.studentId;
 
-    // Result.find({'student': test_id})
-    //     .sort([['score', 'ascending']])
-    //     .exec(function (err, list_results) {
-    //         if (err) { 
-    //             res.status(500).send({
-    //                 message:
-    //                   err.message || "Cannot retrieve test result of this subject."
-    //               });
-    //         }
-
-    //         list_results.aggregate([{
-    //             $group: {
-    //                 _id: "$subject",
-    //                 avgScore: {$avg: "$score"}
-    //             }
-    //         }])
-    //         // Successful
-    //         res.send({ result_list: list_results });
-    //     })
-    Result.aggregate().match({'student': student_id}).group({_id: "$subject"})
-        .exec(function(err, result) {
-            if(err) {
+    Result.find({'student': student_id})
+        .sort([['score', 'ascending']])
+        .populate('subject')
+        .exec(function (err, result) {
+            if (err) { 
                 res.status(500).send({
-                    message: err.message// "Cannot retrieve test result of this student."
+                    message:
+                      err.message || "Cannot retrieve test result of this subject."
                   });
-                return;
             }
-            // populate subject
-            //Result.populate(result, {path: 'subject'})
-            // Successful
             res.send({ result_list: result });
+
+            // Result.aggregate(list_results, [{
+            //     $group: {
+            //         _id: "$subject",
+            //         avgScore: {$avg: "$score"}
+            //     }
+            // }])
+            //     .exec(function (err, result) {
+            //         if (err) { 
+            //             res.status(500).send({
+            //                 message:
+            //                 err.message || "Cannot retrieve test result of this subject."
+            //             });
+            //         }
+            //     // Successful
+            //         res.send({ result_list: result });
+            //     })
         })
+    //Result.aggregate().match({'student': student_id}).group({_id: "$subject"})
+    // Result.aggregate([
+    //     {
+    //         $match: {'student': student_id}
+    //     },
+    //     {
+    //         $group: {
+    //             _id: "$subject",
+    //             averageGrade: { $avg: "$score"}
+    //         }
+    //     }
+    // ])
+    //     .exec(function(err, result) {
+    //         if(err) {
+    //             res.status(500).send({
+    //                 message: err.message// "Cannot retrieve test result of this student."
+    //               });
+    //             return;
+    //         }
+    //         // populate subject
+    //         // Result.populate(result, {path: 'subject'});
+    //         // Successful
+    //         res.send({ result_list: result });
+    //     })
 };
 
 // Display detail data (student and score) by test id

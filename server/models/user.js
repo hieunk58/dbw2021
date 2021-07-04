@@ -10,17 +10,5 @@ var UserSchema = new Schema({
   role: { type: Schema.ObjectId, ref: 'Role' }
 });
 
-// Virtual for user "full" name.
-UserSchema.virtual('full_name').get(function() {
-  return this.family_name + ', ' + this.first_name;
-});
-
-// Virtual for user's url
-UserSchema
-.virtual('url')
-.get(function() {
-    return '/user/' + this._id; // TODO define url later
-});
-
 // Export model.
 module.exports = mongoose.model('User', UserSchema);

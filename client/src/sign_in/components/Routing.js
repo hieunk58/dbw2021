@@ -4,7 +4,6 @@ import { Switch } from "react-router-dom";
 import { withStyles } from "@material-ui/core";
 import Dashboard from "./users/Dashboard";
 import Classes from "./classes/Classes";
-import Subjects from "./subjects/Subjects";
 import StudentPage from "./student/StudentPage";
 import TeacherPage from "./teacher/TeacherPage";
 import PropsRoute from "../../shared/components/PropsRoute";
@@ -90,16 +89,6 @@ function Routing(props) {
           // setStudentList={setStudentList}
         />
         <PropsRoute
-          path="/c/subjects"
-          component={Subjects}
-          pushMessageToSnackbar={pushMessageToSnackbar}
-          selectSubject={selectSubject}
-          // subjectList={subjectList}
-          // setSubjectList={setSubjectList}
-          // teacherList={teacherList}
-          // setTeacherList={setTeacherList}
-        />
-        <PropsRoute
           path="/c/users"
           component={Dashboard}
           pushMessageToSnackbar={pushMessageToSnackbar}
@@ -149,13 +138,10 @@ Routing.propTypes = {
   setClassList: PropTypes.func.isRequired,
   selectDashboard: PropTypes.func.isRequired,
   selectClass: PropTypes.func.isRequired,
-  selectSubject: PropTypes.func.isRequired,
   selectTeacherPage: PropTypes.func.isRequired,
   selectStudentPage: PropTypes.func.isRequired,
   studentList: PropTypes.arrayOf(PropTypes.object).isRequired,
   setStudentList: PropTypes.func.isRequired,
-  
-  // openAddBalanceDialog: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles, { withTheme: true })(memo(Routing));

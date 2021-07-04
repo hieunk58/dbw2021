@@ -169,13 +169,13 @@ function Main(props) {
   }, [
     setSelectedTab,
   ]);
-  const selectSubject = useCallback(() => {
-    document.title = "TU Chemnitz - Subjects";
-    setSelectedTab("Subjects");
+  // const selectSubject = useCallback(() => {
+  //   document.title = "TU Chemnitz - Subjects";
+  //   setSelectedTab("Subjects");
     
-  }, [
-    setSelectedTab,
-  ]);
+  // }, [
+  //   setSelectedTab,
+  // ]);
   const selectStudentPage = useCallback(() => {
     document.title = "TU Chemnitz - Student View";
     setSelectedTab("Student");
@@ -291,7 +291,7 @@ function Main(props) {
           <Routing
             selectDashboard={selectDashboard}
             selectClass={selectClass}
-            selectSubject={selectSubject}
+            // selectSubject={selectSubject}
             selectStudentPage={selectStudentPage}
             selectTeacherPage={selectTeacherPage}
             currentUser={currentUser}

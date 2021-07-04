@@ -1,4 +1,4 @@
-import api from "../api";
+import api from "./api";
 
 class DataService {
     // class
@@ -44,7 +44,6 @@ class DataService {
     
     // user
     getUserList() { 
-        console.log("getUserList");
         return api.get('/users'); 
     }
     getUserDetail(id) { 
