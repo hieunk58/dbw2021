@@ -31,11 +31,10 @@ Server will run and listen on PORT 8080.\
 You can change the port in the file .env in the server folder\
 If you change the listening port of the server. 
 Don't forget to change it in the client proxy.\
-Go to client folder, find below line in the file package.json
-"proxy": "http://127.0.0.1:8080"\
-Change the port to your new server listening port
+Go to client folder, find below line in the file package.json and change the port to your new server listening port\
+"proxy": "http://127.0.0.1:8080"
 
-Client will run on the address: http:localhost:3000 by default\
+Client will run on the address: "http:localhost:3000" by default\
 You can also change the port in the file .env in the client folder.\
 Add new line: PORT=YOUR_NEW_PORT.\
 Example: PORT=3001

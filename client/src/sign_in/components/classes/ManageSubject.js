@@ -7,6 +7,7 @@
     TablePagination,
     TableRow,
     IconButton,
+    Tooltip,
     Box,
     Paper,
     Typography,
@@ -16,6 +17,10 @@
     withStyles,
   } from "@material-ui/core";
 
+  import jsPDF from "jspdf";
+  import "jspdf-autotable";
+
+  import GetAppIcon from '@material-ui/icons/GetApp';
   import DeleteIcon from "@material-ui/icons/Delete";
   import EditIcon from "@material-ui/icons/Edit";
   import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
@@ -242,7 +247,32 @@
       fetchSubjectList();
     }, [fetchSubjectList]);
 
-
+    const exportToPdf = () => {
+      const unit = "pt";
+      const size = "A4"; // Use A1, A2, A3 or A4
+      const orientation = "portrait"; // portrait or landscape
+  
+      const marginLeft = 40;
+      const doc = new jsPDF(orientation, unit, size);
+      doc.setFontSize(16);
+  
+      const title = "List of subject";
+      const headers = [["SUBJECT NAME", "INSTRUCTOR", ["CLASS"]]];
+  
+      const data = subjectList.map(elem => [elem.subject_name, elem.teacher.first_name + " " + elem.teacher.family_name, 
+        elem.class.class_name]);
+  
+      let content = {
+        startY: 50,
+        head: headers,
+        body: data
+      };
+  
+      doc.text(title, marginLeft, 40);
+      doc.autoTable(content);
+      doc.save("list_subject.pdf")
+    }
+  
     // useEffect(() => {
     //   fetchSubjectList(currentClass._id);
     // }, []);
@@ -250,7 +280,23 @@
     return (
       <Paper>
         <Toolbar className={classes.toolbar}>
-          <Typography variant="h6">Subject List</Typography>
+          <Box display="flex">
+            <Typography variant="h6">Subject List</Typography>
+            <Tooltip
+              title="Export"
+              placement="top"
+            >
+              <IconButton
+                className={classes.iconButton}
+                onClick={() => {
+                  exportToPdf()
+                }}
+                aria-label="Export"
+              >
+                <GetAppIcon className={classes.blackIcon} fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
           <Button 
             variant="contained"
             color="primary"
@@ -321,6 +367,7 @@
                   rowCount={subjectList.length}
                   rows={rows}
                 />
+                
                 <TableBody>
                   {stableSort(subjectList, getSorting(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)

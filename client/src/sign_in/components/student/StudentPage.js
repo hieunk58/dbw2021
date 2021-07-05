@@ -266,7 +266,7 @@ function CustomTable(props) {
                         {row.subject_name}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.class.class_name}
+                        {1}
                       </TableCell>
                       <TableCell component="th" scope="row">
                         <Box display="flex" justifyContent="flex-end">

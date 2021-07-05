@@ -8,6 +8,7 @@ import {
   TableRow,
   IconButton,
   Avatar,
+  Tooltip,
   Box,
   Paper,
   Typography,
@@ -17,6 +18,10 @@ import {
   withStyles,
 } from "@material-ui/core";
 
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+
+import GetAppIcon from '@material-ui/icons/GetApp';
 import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
@@ -199,10 +204,53 @@ function CustomTable(props) {
     [setIsEditUserDialogOpen, setEditUserDialogRow]
   );
 
+  const exportToPdf = () => {
+    const unit = "pt";
+    const size = "A4"; // Use A1, A2, A3 or A4
+    const orientation = "portrait"; // portrait or landscape
+
+    const marginLeft = 40;
+    const doc = new jsPDF(orientation, unit, size);
+    doc.setFontSize(16);
+
+    const title = "List of user";
+    const headers = [["NAME", "USERNAME", ["ROLE"]]];
+
+    const data = targets.map(elem => [elem.first_name + " " + elem.family_name,
+                              elem.username, elem.role.name]);
+
+    let content = {
+      startY: 50,
+      head: headers,
+      body: data
+    };
+
+    doc.text(title, marginLeft, 40);
+    doc.autoTable(content);
+    doc.save("list_user.pdf")
+  }
+
+
   return (
     <Paper>
       <Toolbar className={classes.toolbar}>
+      <Box display="flex" p={1} m={1} justifyContent="flex-start">
         <Typography variant="h6">User List</Typography>
+        <Tooltip
+          title="Export"
+          placement="top"
+        >
+          <IconButton
+            className={classes.iconButton}
+            onClick={() => {
+              exportToPdf()
+            }}
+            aria-label="Export"
+          >
+            <GetAppIcon className={classes.blackIcon} fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Box>
         <Button
           variant="contained"
           color="secondary"
