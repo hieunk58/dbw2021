@@ -75,7 +75,7 @@ exports.class_update_post = function (req, res) {
             }
             if(!result) {
                 res.status(404).send({
-                message: "Cannot update this class."
+                message: "Class not found"
               });
             } else {
                 res.send({ message: "Class was updated successfully." });

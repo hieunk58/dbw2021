@@ -28,7 +28,7 @@ import stableSort from "../../../shared/functions/stableSort";
 import getSorting from "../../../shared/functions/getSorting";
 import HighlightedInformation from "../../../shared/components/HighlightedInformation";
 import ResultReport from "./ResultDetailsDialog";
-import DataService from "../../../services/data.service";
+// import DataService from "../../../services/data.service";
 // import AuthService from "../../../services/auth.service";
 // import ManageTest from "./ManageTest";
 
@@ -77,7 +77,7 @@ const rowsPerPage = 25;
 
 function CustomTable(props) {
   // const location = useLocation();
-  const { classes, selectStudentPage, currentUser, studyingClass, subjectList, testResultList } = props;
+  const { classes, selectStudentPage, subjectList, testResultList } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
@@ -93,18 +93,18 @@ function CustomTable(props) {
 
   const [open, setOpen] = useState(false);
 
-  function calculateAvgResult() {
-    // call this in useEffect
-    var results = [];
-    for(let i = 0; i < testResultList.length; ++i) {
-      if(testResultList[i].student === currentUser.id) {
-        // this test result belongs to current signed in student
-        results.push(testResultList[i]);
-      }
-    }
-    // target list: [{subject, avgGrade}]
+  // function calculateAvgResult() {
+  //   // call this in useEffect
+  //   var results = [];
+  //   for(let i = 0; i < testResultList.length; ++i) {
+  //     if(testResultList[i].student === currentUser.id) {
+  //       // this test result belongs to current signed in student
+  //       results.push(testResultList[i]);
+  //     }
+  //   }
+  //   // target list: [{subject, avgGrade}]
     
-  }
+  // }
 
   const getTestResultBySubject = useCallback((subjectId) => {
     var results = [];

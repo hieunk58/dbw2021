@@ -84,9 +84,9 @@ class DataService {
     createSubject(data) {
         return api.post('/subject/create', data);
     }
-    archiveSubject(id, data) {
+    archiveSubject(id) {
         // archive is just update variable isArchived = true
-        return api.post(`/subject/${id}/update`, data);
+        return api.post(`/subject/${id}/archive`);
     }
 
     // test

@@ -1,10 +1,8 @@
-import React, { memo, useState, useEffect, useCallback } from "react";
+import React, { memo, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core";
 import NavBar from "./navigation/NavBar";
 import DialogSelector from "./login/DialogSelector";
-import Routing from "./Routing";
-import SignIn from "./SignIn";
 import HeadSection from "./home/HeadSection";
 
 const styles = (theme) => ({
@@ -34,12 +32,12 @@ function Main(props) {
   const [dialogOpen, setDialogOpen] = useState(null);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
-  const selectHome = useCallback(() => {
-    // smoothScrollTop();
-    document.title =
-      "TU Chemnitz Management System";
-    setSelectedTab("Home");
-  }, [setSelectedTab]);
+  // const selectHome = useCallback(() => {
+  //   // smoothScrollTop();
+  //   document.title =
+  //     "TU Chemnitz Management System";
+  //   setSelectedTab("Home");
+  // }, [setSelectedTab]);
 
   const openLoginDialog = useCallback(() => {
     setDialogOpen("login");

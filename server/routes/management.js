@@ -55,6 +55,7 @@ router.post('/subject/:id/update', subject_controller.subject_update_post);
 router.post('/subject/:id/delete', subject_controller.subject_delete_post);
 // GET subject detail
 router.get('/subject/:id', subject_controller.subject_detail);
+router.post('/subject/:id/archive', subject_controller.subject_archive_post);
 /// END SUBJECT ROUTES ///
 
 /// TEST ROUTES ///

@@ -1,6 +1,4 @@
 const express = require('express');
-// var bodyParser = require('body-parser')
-const dbConfig = require("./config/db.config");
 // routes
 var userRouter = require('./routes/user');
 var authRouter = require('./routes/auth');
@@ -9,8 +7,6 @@ var managementRouter = require('./routes/management');
 const app = express();
 // Used to create some test data
 const db = require("./models");
-const Role = db.role;
-const User = db.user;
 
 // Set up mongoose connection
 var mongoose = require('mongoose');
@@ -36,10 +32,6 @@ const port = process.env.PORT || 8080;
 app.listen(port, () => console.log(`Listening on port ${port}!`));
 
 // fix cors error
-// app.use((req, res, next) => {
-//   res.header('Access-Control-Allow-Origin', '*');
-//   next();
-// });
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,DELETE, POST,PUT");
@@ -80,50 +72,15 @@ app.use((req, res, next) => {
 
 // log errors to console
 function logErrors(err, req, res, next) {
-console.error(err.stack);
-next(err);
+  console.error(err.stack);
+  next(err);
 }
 // error handling for xhr request
 function clientErrorHandler(err, req, res, next) {
-if (req.xhr) {
- //console.log('xhr request');
- res.status(400).send({status: 400, message: "Bad request from client", error: err.message });
-} else {
- next(err);
+  if (req.xhr) {
+    //console.log('xhr request');
+    res.status(400).send({status: 400, message: "Bad request from client", error: err.message });
+  } else {
+    next(err);
+  }
 }
-}
-// function initial() {
-//   Role.estimatedDocumentCount((err, count) => {
-//     if (!err && count === 0) {
-//       new Role({
-//         name: "student"
-//       }).save(err => {
-//         if (err) {
-//           console.log("error", err);
-//         }
-
-//         console.log("added 'student' to roles collection");
-//       });
-
-//       new Role({
-//         name: "teacher"
-//       }).save(err => {
-//         if (err) {
-//           console.log("error", err);
-//         }
-
-//         console.log("added 'teacher' to roles collection");
-//       });
-
-//       new Role({
-//         name: "admin"
-//       }).save(err => {
-//         if (err) {
-//           console.log("error", err);
-//         }
-
-//         console.log("added 'admin' to roles collection");
-//       });
-//     }
-//   });
-// }

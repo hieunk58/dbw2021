@@ -104,17 +104,17 @@ exports.user_update_post = function (req, res) {
             if (err) { 
                 res.status(500).send({
                     message:
-                      err.message || "Cannot update user."
+                      err.message || "Cannot update user"
                 });
                 return;
             }
             
             if(!result) {
                 res.status(404).send({
-                message: `Cannot update user with id=${id}`
+                message: "User not found"
               });
             } else {
-                res.send({ message: "Class was updated successfully." });
+                res.send({ message: "User was updated successfully." });
             }
         });
 };

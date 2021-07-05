@@ -264,10 +264,6 @@ function Main(props) {
   }, [getCurrentUser]);
 
   useEffect(() => {
-    console.log("fetching some data");
-    // getCurrentUser();
-    // user list
-    // fetchRandomSubjects(currentUser);
     fetchRandomUsers();
     fetchTeacherList();
     fetchRandomClasses();

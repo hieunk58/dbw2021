@@ -13,7 +13,7 @@ exports.test_list = function (req, res, next) {
             if (err) { 
                 res.status(500).send({
                     message:
-                      err.message || "Cannot retrieve test of this subject."
+                      err.message || "Cannot retrieve test."
                   });
                 return;
             }
@@ -40,7 +40,7 @@ exports.test_detail = function (req, res, next) {
         if (err) { 
             res.status(500).send({
                 message:
-                  err.message || "Cannot retrieve test details."
+                  err.message || "Cannot retrieve test details"
               });
             return;
         }
@@ -73,7 +73,7 @@ exports.test_update_post = function (req, res) {
             }
             if(!result) {
                 res.status(404).send({
-                message: `Cannot update test with id=${id}`
+                message: "Test not found"
               });
             } else {
                 res.send({ message: "Test was updated successfully." });
@@ -86,10 +86,16 @@ exports.test_delete_post = function(req, res) {
     var id = req.params.id;
     
     Test.findByIdAndRemove(id)
-        .exec(function (err) {
+        .exec(function (err, found) {
             if (err) { 
                 res.status(500).send({
-                    message: "Cannot delete this test. Test not found"
+                    message: "Cannot delete this test"
+                });
+                return;
+            }
+            if(!found) {
+                res.status(404).send({
+                    message: "Test not found"
                 });
                 return;
             }
@@ -132,7 +138,7 @@ exports.test_create_post = function(req, res) {
             if(found_test) {
                 res.status(400).send({
                     message:
-                    err.message || 'Test with name=${test_name} is already existed.'
+                    err.message || 'Test is already existed.'
                 });
                 return;
             }

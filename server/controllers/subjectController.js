@@ -70,7 +70,7 @@ exports.subject_update_post = function (req, res) {
             }
             if(!result) {
                 res.status(404).send({
-                message: `Cannot update subject with id=${id}`
+                message: "Subject not found"
               });
             } else {
                 res.send({ message: "Subject was updated successfully." });
@@ -94,7 +94,7 @@ exports.subject_delete_post = function(req, res) {
     }, function(err, results) {
         if(err) {
             res.status(500).send({
-                message: "Cannot delete subject. Subject not found"
+                message: "Cannot delete subject"
             });
             return;
         }
@@ -105,15 +105,15 @@ exports.subject_delete_post = function(req, res) {
                 .exec(function (err) {
                     if (err) { 
                         res.status(500).send({
-                            message: "Cannot delete subject. Subject not found"
+                            message: "Cannot delete subject"
                         });
                         return;
                     }
                     res.send({ message: "Subject was deleted successfully." });
             });
         } else {
-            res.status(500).send({
-                message: "Cannot delete. This subject has dependent test."
+            res.status(401).send({
+                message: "Cannot delete subject has dependent test."
             });
         }
     });
@@ -165,18 +165,22 @@ exports.subject_archive_post = function(req, res) {
                 });
                 return;
             }
-        });
-    Subject.findByIdAndUpdate(id, {'isArchived': true})
-        .exec(function(err) {
-            if(err) {
-                res.status(500).send({
-                    message: "Subject not found."
+            if(found_one) {
+                Subject.findByIdAndUpdate(id, {'isArchived': true})
+                    .exec(function(err) {
+                        if(err) {
+                            res.status(500).send({
+                                message: "Cannot archive this subject"
+                            });
+                            return;
+                        }
+                        // successful
+                        res.send({ message: "Subject was archived successfully." });
+                    });
+            } else {
+                res.status(400).send({
+                    message: "Cannot archive subject with no test"
                 });
-                return;
             }
-            // successful
-            res.send({ message: "Subject was archived successfully." });
         });
 };
-
-// handle admin add subject 

@@ -31,7 +31,7 @@ exports.student_result_list = function (req, res, next) {
             if (err) { 
                 res.status(500).send({
                     message:
-                      err.message || "Cannot retrieve test result of this subject."
+                      err.message || "Cannot retrieve test result of this student."
                   });
             }
             res.send({ result_list: result });
@@ -122,13 +122,14 @@ exports.result_update_post = function (req, res) {
             if (err) { 
                 res.status(500).send({
                     message:
-                      err.message || "Cannot update this test result. Test result not found"
+                      err.message || "Cannot update this test result"
                 });
             }
             if(!result) {
                 res.status(404).send({
-                message: "Cannot update this test result"
+                message: "Test result not found"
               });
+              return;
             } else {
                 res.send({ message: "Result was updated successfully." });
             }
@@ -163,7 +164,7 @@ exports.result_create_post = function (req, res) {
                 return;
             }
             if(found) {
-                res.status(500).send({
+                res.status(400).send({
                     message: "Test result for this student is already created."
                 });
                 return;
@@ -184,10 +185,16 @@ exports.result_delete_post = function(req, res) {
     var id = req.params.id;
     
     Result.findByIdAndRemove(id)
-        .exec(function (err) {
+        .exec(function (err, found) {
             if (err) { 
                 res.status(500).send({
-                    message: "Cannot delete this test result. Test result not found"
+                    message: "Cannot delete this test result"
+                });
+                return;
+            }
+            if(!found) {
+                res.status(404).send({
+                    message: "Test result not found"
                 });
                 return;
             }
