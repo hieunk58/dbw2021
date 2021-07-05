@@ -2,7 +2,7 @@
 This project can be found on my github [DBW2021](https://github.com/hieunk58/dbw2021)
 
 This guide will help you set up and run project on local machine.
-Project contains two apps: client and server
+Project contains two apps: client and server.
 After download and unzip, go to each folder to install packages.
 Make sure you already install npm on your machine.
 
@@ -19,9 +19,9 @@ Install packages for server app
 ### DATABASE
 
 Database used in this project is on the cloud [MongoDB Atlat](https://www.mongodb.com/cloud/atlas).
-I already created a database and configure it in the server.js. 
+I already created a database and configure it in the file server.js of server folder.
 You are ready to use without further database configuration.
-If you like to use local database, please find below lind and replece by your configuration
+If you like to use local database, please find below lind and replace by your configuration
 mongoDB = 'mongodb+srv://hieunk58:123456a@@cluster0.f76yh.mongodb.net/tuc_db?retryWrites=true&w=majority';
 
 ### RUNNING
