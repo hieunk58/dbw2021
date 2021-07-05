@@ -26,6 +26,20 @@ mongoDB = 'mongodb+srv://hieunk58:123456a@@cluster0.f76yh.mongodb.net/tuc_db?ret
 
 ### RUNNING
 After installing all required packages for both client and server app, you now can run it.
+
+Server will run and listen on PORT 8080.<br/>
+You can change the port in the file .env in the server folder<br/>
+If you change the listening port of the server. 
+Don't forget to change it in the client proxy.<br/>
+Go to client folder, find below line in the file package.json
+"proxy": "http://127.0.0.1:8080"
+Change the port to your new server listening port
+
+Client will run on the address: http:localhost:3000 by default<br>
+You can also change the port in the file .env in the client folder.<br/>
+Add new line: PORT=YOUR_NEW_PORT.<br>
+Example: PORT=3001
+
 Running server
 ### cd server
 ### npm run dev
@@ -35,6 +49,21 @@ Running client
 ### cd client
 ### npm start
 React app also supports reload automatically if there is any changes in our source code.
+
+### TESTING ACCOUNT
+I already created some accounts, you can use it or use admin account to create new one.
+
+Admin
+username: admin
+password: 1
+
+Teacher
+username: oli
+password: 1
+
+Student
+username: hugh
+password: 1
 
 ### CONTACT
 If you have any problem with setting up and running my project.
