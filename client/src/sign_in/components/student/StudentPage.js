@@ -165,10 +165,21 @@ function CustomTable(props) {
        }
    })
   
-    console.log(result);
+   // fix issue when student doesn't have a test result -> don't show subject
+   // base on both testResultList and subjectList
+  let difference = subjectList.filter(({ _id: id1 }) => !result.some(({ _id: id2 }) => id2 === id1));
+   console.log(difference);
+  for(let i = 0 ; i < difference.length; ++i) {
+    var subject = {'_id': difference[i]._id, 
+      'name': difference[i].subject_name, 
+      'score': "No result"};
+    result.push(subject);
+  }
+
+    // console.log(result);
     setAverageTestResultList(result);
 
-  }, [setAverageTestResultList]);
+  }, [subjectList]);
 
   const exportToPdf = () => {
     const unit = "pt";
