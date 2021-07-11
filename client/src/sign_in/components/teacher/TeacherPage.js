@@ -16,6 +16,7 @@ import {
   withStyles,
 } from "@material-ui/core";
 
+import AssessmentIcon from '@material-ui/icons/Assessment';
 import LibraryBooksIcon from '@material-ui/icons/ChromeReaderMode';
 import SubjectIcon from "@material-ui/icons/Subject";
 // import AssignmentIcon from "@material-ui/icons/Assignment";
@@ -26,6 +27,7 @@ import HighlightedInformation from "../../../shared/components/HighlightedInform
 import DataService from "../../../services/data.service";
 // import AuthService from "../../../services/auth.service";
 import ManageTest from "./ManageTest";
+import ResultDetailsDialog from "../student/ResultDetailsDialog";
 
 const styles = (theme) => ({
   tableWrapper: {
@@ -78,6 +80,7 @@ function CustomTable(props) {
   const [page, setPage] = useState(0);
   // const [currentUser, setCurrentUser] = useState(undefined);
   const [isManageTestPageOpen, setIsManageTestPageOpen] = useState(false);
+  const [isResultDetailsDialogOpen, setIsResultDetailsDialogOpen] = useState(false);
   
   const [currentSelectedSubject, setCurrentSelectedSubject] = useState(null);
   // test list is all test
@@ -157,6 +160,18 @@ function CustomTable(props) {
     setIsManageTestPageOpen(false);
   }, [setIsManageTestPageOpen]);
 
+  const openResultDetailsDialog = useCallback((row) => {
+    // setCurrentSelectedSubject(row);
+    // console.log("get test list by subject id: ", row._id);
+    // fetchTestListBySubject(row)
+    // fetchStudentListBySubject(row);
+    setIsResultDetailsDialogOpen(true);
+  }, [setIsResultDetailsDialogOpen]);
+
+  const closeResultDetailsDialog = useCallback(() => {
+    setIsResultDetailsDialogOpen(false);
+  }, [setIsResultDetailsDialogOpen]);
+
   // useEffect(() => {
   //   console.log('teacher page');
   //   const user = AuthService.getCurrentUser();
@@ -197,6 +212,11 @@ function CustomTable(props) {
       <Toolbar className={classes.toolbar}>
         <Typography variant="h6">Subject List</Typography>
       </Toolbar>
+      <ResultDetailsDialog
+        open={isResultDetailsDialogOpen}
+        testResultList={testResultListBySubject}
+        onClose={closeResultDetailsDialog}
+      />
       <Divider />
       <Box width="100%">
         <div className={classes.tableWrapper}>
@@ -253,11 +273,11 @@ function CustomTable(props) {
                             <IconButton
                               className={classes.iconButton}
                               onClick={() => {
-                                // openManageTestPage(row)
+                                openResultDetailsDialog(row)
                               }}
                               aria-label="Results"
                             >
-                              <SubjectIcon className={classes.blackIcon} />
+                              <AssessmentIcon className={classes.blackIcon} />
                             </IconButton>
                           </Tooltip>
                         </Box>

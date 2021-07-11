@@ -62,7 +62,7 @@ const EditTestResultDialog = withTheme(forwardRef(function (props, ref) {
     <FormDialog
       open={open}
       onClose={onClose}
-      headline= "Edit Test"
+      headline= "Edit Test Result"
       hideBackdrop={false}
       loading={loading}
       onFormSubmit={async event => {
