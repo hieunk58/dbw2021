@@ -3,6 +3,7 @@ var async = require('async')
 var User = require('../models/user') // user with role="student"
 var Enrollment = require('../models/enrollment')
 var Role = require('../models/role')
+var Result = require('../models/result')
 
 exports.class_student_get = function(req, res) {
     var classId = req.params.id;
@@ -61,12 +62,24 @@ exports.register_student_post = function(req, res) {
     var new_enrollment = new Enrollment({ 'class': classId, 'student': studentId });
 
     Enrollment.findOneAndDelete({ 'student': studentId })
-        .exec(function(err) {
+        .exec(function(err, found) {
             if(err) {
                 res.status(500).send({
                     message: "Cannot add student to this class."
                 });
                 return;
+            }
+            if(found) {
+                // when deregister a student, remove all test results belong to that student
+                Result.deleteMany({'student': found.student})
+                    .exec(function(err) {
+                        if(err) {
+                            res.status(500).send({
+                                message: "Cannot deregister this student"
+                            });
+                            return;
+                        }
+                    });
             }
             // delete previous one successfully, save new one
             new_enrollment.save(function(err) {
@@ -113,12 +126,24 @@ exports.deregister_student_post = function(req, res) {
     var id = req.body.id;
 
     Enrollment.findByIdAndRemove(id)
-        .exec(function(err) {
+        .exec(function(err, found) {
             if(err) {
                 res.status(500).send({
                     message: "Cannot deregister this student"
                 });
                 return;
+            }
+            if(found) {
+                // when deregister a student, remove all test results belong to that student
+                Result.deleteMany({'student': found.student})
+                    .exec(function(err) {
+                        if(err) {
+                            res.status(500).send({
+                                message: "Cannot deregister this student"
+                            });
+                            return;
+                        }
+                    });
             }
             res.send({ message: "Deregister student successfully." });
         });
