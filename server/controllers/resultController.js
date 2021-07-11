@@ -8,7 +8,8 @@ exports.result_list = function (req, res, next) {
     Result.find()
         .populate('test')
         .populate('subject')
-        .sort([['score', 'ascending']])
+        .populate('student')
+        // .sort([['score', 'ascending']])
         .exec(function (err, list_results) {
             if (err) { 
                 res.status(500).send({

@@ -84,9 +84,6 @@ function Routing(props) {
           teacherList={teacherList}
           setClassList={setClassList}
           subjectList={subjectList}
-          // setSubjectList={setSubjectList}
-          // studentList={studentList}
-          // setStudentList={setStudentList}
         />
         <PropsRoute
           path="/c/users"
@@ -97,8 +94,6 @@ function Routing(props) {
           selectDashboard={selectDashboard}
         />
         <PropsRoute
-          // student view
-          // path="/profile/student"
           path="/c/student"
           component={StudentPage}
           selectStudentPage={selectStudentPage}
@@ -115,10 +110,6 @@ function Routing(props) {
           selectTeacherPage={selectTeacherPage}
           pushMessageToSnackbar={pushMessageToSnackbar}
           subjectListByTeacher={subjectListByTeacher}
-          // setSubjectListByTeacher={setSubjectListByTeacher}
-          // targets={targets}
-          // setTargets={setTargets}
-          // selectDashboard={selectDashboard}
         />
       </Switch>
     </div>
@@ -141,6 +132,8 @@ Routing.propTypes = {
   selectTeacherPage: PropTypes.func.isRequired,
   selectStudentPage: PropTypes.func.isRequired,
   studentList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  testResultList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  allResultList: PropTypes.arrayOf(PropTypes.object).isRequired,
   setStudentList: PropTypes.func.isRequired,
 };
 

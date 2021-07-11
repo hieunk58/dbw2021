@@ -129,6 +129,7 @@ function Main(props) {
             if(list[i].teacher._id === currentUser.id) {
               subjects.push(list[i]);
             }
+            console.log("studyingClass: ", studyingClass);
             if(list[i].class._id === studyingClass) {
               subjectByClass.push(list[i]);
             }
@@ -217,19 +218,20 @@ function Main(props) {
   }, [setStudyingClass]);
 
   const fetchTestResult = useCallback((userId) => {
+    console.log("userId: ", userId)
     DataService.getTestResultList()
-      .then(res => {
-        console.log("result list: ", res.data.result_list);
-        var results = [];
-        var list = res.data.result_list;
-        for(let i = 0 ; i < list.length; ++i) {
-          if(list[i].student === userId) {
-              console.log("result with student id: ",list[i].student )
-            results.push(list[i]);
-          }
+    .then(res => {
+      console.log("result list: ", res.data.result_list);
+      var results = [];
+      var list = res.data.result_list;
+      for(let i = 0 ; i < list.length; ++i) {
+        if(list[i].student._id === userId) {
+          console.log("result with student id: ",list[i].student._id )
+          results.push(list[i]);
         }
-        //
-        setTestResultList(results);
+      }
+      // result list by student id
+      setTestResultList(results);
       });
   }, []);
 

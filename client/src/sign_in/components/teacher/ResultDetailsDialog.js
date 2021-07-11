@@ -43,7 +43,7 @@ const ResultDetailsDialog = withTheme(function (props) {
                     testResultList.map((row, index) => (
                       <TableRow hover tabIndex={-1} key={index}>
                         <TableCell component="th" scope="row" align="center">
-                          {row.student.first_name + " " + row.student.family_name}
+                          {row.name}
                         </TableCell>
                         <TableCell component="th" scope="row" align="center">
                           {row.score}

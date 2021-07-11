@@ -27,7 +27,7 @@ import HighlightedInformation from "../../../shared/components/HighlightedInform
 import DataService from "../../../services/data.service";
 // import AuthService from "../../../services/auth.service";
 import ManageTest from "./ManageTest";
-import ResultDetailsDialog from "../student/ResultDetailsDialog";
+import ResultDetailsDialog from "../teacher/ResultDetailsDialog";
 
 const styles = (theme) => ({
   tableWrapper: {
@@ -84,7 +84,7 @@ function CustomTable(props) {
   
   const [currentSelectedSubject, setCurrentSelectedSubject] = useState(null);
   // test list is all test
-  // const [testList, setTestList] = useState([]);
+  const [testResultList, setTestResultList] = useState([]);
   // extract test by subject id from test list
   const [testListBySubject, setTestListBySubject] = useState([]);
   const [testResultListBySubject, setTestResultListBySubject] = useState([]);
@@ -110,6 +110,52 @@ function CustomTable(props) {
     },
     [setPage]
   );
+
+  const fetchTestResult = useCallback(() => {
+    DataService.getTestResultList()
+    .then(res => {
+      console.log("result list: ", res.data.result_list);
+      setTestResultList(res.data.result_list);
+      });
+  }, [setTestResultList]);
+
+  const calculateAvgResult = useCallback ((list, subjectId) => {
+    var resultList = [];
+
+    for(let i = 0; i < list.length; ++i) {
+      if(list[i].subject._id === subjectId) {
+        // take all test results belong to current student
+        var temp = {
+        'name': list[i].student.first_name + " " + list[i].student.family_name,
+        'score': list[i].score };
+        resultList.push(temp);
+      }
+    }
+
+    // Calculate the sums and group data (while tracking count)
+    const reduced = resultList.reduce(function(m, d){
+        if(!m[d.name]){
+          m[d.name] = {...d, count: 1};
+          return m;
+        }
+        m[d.name].score += d.score;
+        m[d.name].count += 1;
+        return m;
+    },{});
+   
+   // Create new array from grouped data and compute the average
+   const result = Object.keys(reduced).map(function(k){
+       const item  = reduced[k];
+       return {
+           name: item.name,
+           score: (item.score/item.count).toFixed(2)
+       }
+   })
+  
+    console.log(result);
+    setTestResultListBySubject(result);
+
+  }, [setTestResultListBySubject]);
 
   const fetchTestListBySubject = useCallback((currentSubject) => {
     // get test list by subject id
@@ -157,40 +203,29 @@ function CustomTable(props) {
   }, [fetchStudentListBySubject]);
 
   const closeManageTestPage = useCallback(() => {
+    // when changing something in test, test result page, get all test result again
+    fetchTestResult();
     setIsManageTestPageOpen(false);
-  }, [setIsManageTestPageOpen]);
+  }, [fetchTestResult]);
 
   const openResultDetailsDialog = useCallback((row) => {
     // setCurrentSelectedSubject(row);
-    // console.log("get test list by subject id: ", row._id);
+    console.log("get test result list by subject id: ", row._id);
     // fetchTestListBySubject(row)
     // fetchStudentListBySubject(row);
+    console.log("testResultList: ", testResultList);
+    calculateAvgResult(testResultList, row._id);
     setIsResultDetailsDialogOpen(true);
-  }, [setIsResultDetailsDialogOpen]);
+  }, [calculateAvgResult, testResultList]);
 
   const closeResultDetailsDialog = useCallback(() => {
     setIsResultDetailsDialogOpen(false);
   }, [setIsResultDetailsDialogOpen]);
 
-  // useEffect(() => {
-  //   console.log('teacher page');
-  //   const user = AuthService.getCurrentUser();
-  //   console.log("getCurrentUser: ", user);
-  //   // if (user) {
-  //   //   setCurrentUser(user);
-  //   //   console.log("current user: ", user);
-  //   //   // setShowAdminPage(user.role.name === "admin");
-  //   //   // setShowTeacherPage(user.role.name === "teacher");
-  //   // }
-  //   console.log("location: ", location);
-  //   console.log("currentUser: ", currentUser);
-  //   fetchRandomSubjects(currentUser);
-  //   fetchRandomTests();
-
-  // }, [fetchRandomSubjects, fetchRandomTests, location]);
   useEffect(() => {
     selectTeacherPage();
-  }, [selectTeacherPage]);
+    fetchTestResult();
+  }, [fetchTestResult, selectTeacherPage]);
 
   // Open manage subject page
   if(isManageTestPageOpen)
@@ -325,6 +360,7 @@ CustomTable.propTypes = {
   classes: PropTypes.object.isRequired,
   currentUser: PropTypes.object.isRequired,
   subjectListByTeacher: PropTypes.arrayOf(PropTypes.object).isRequired,
+  // testResultList: PropTypes.arrayOf(PropTypes.object).isRequired,
   setSubjectListByTeacher: PropTypes.func.isRequired,
   selectTeacherPage: PropTypes.func.isRequired,
   pushMessageToSnackbar: PropTypes.func.isRequired

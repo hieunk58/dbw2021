@@ -81,32 +81,12 @@ function CustomTable(props) {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
-  // const [currentUser, setCurrentUser] = useState(undefined);
-  // const [isManageTestPageOpen, setIsManageTestPageOpen] = useState(false);
-  
-  // const [currentSelectedSubject, setCurrentSelectedSubject] = useState(null);
   // test list is all test
   const [testResultBySubject, setTestResultBySubject] = useState([]);
   const [averageTestResultList, setAverageTestResultList] = useState([]);
   // each element in averageTestResultList is an object {_id: , name: , score: }
-  // extract test by subject id from test list
-  // const [testListBySubject, setTestListBySubject] = useState([]);
-  // const [subjectList, setSubjectListByTeacher] = useState([]);
 
   const [open, setOpen] = useState(false);
-
-  // function calculateAvgResult() {
-  //   // call this in useEffect
-  //   var results = [];
-  //   for(let i = 0; i < testResultList.length; ++i) {
-  //     if(testResultList[i].student === currentUser.id) {
-  //       // this test result belongs to current signed in student
-  //       results.push(testResultList[i]);
-  //     }
-  //   }
-  //   // target list: [{subject, avgGrade}]
-    
-  // }
 
   const getTestResultBySubject = useCallback((subjectId) => {
     var results = [];
@@ -155,7 +135,7 @@ function CustomTable(props) {
     var testList = [];
 
     for(let i = 0; i < list.length; ++i) {
-      if(list[i].student === currentUser.id) {
+      if(list[i].student._id === currentUser.id) {
         // take all test results belong to current student
         var temp = {'_id': list[i].subject._id, 
         'name': list[i].subject.subject_name, 
@@ -185,7 +165,7 @@ function CustomTable(props) {
        }
    })
   
-    // console.log(result);
+    console.log(result);
     setAverageTestResultList(result);
 
   }, [setAverageTestResultList]);
@@ -202,8 +182,7 @@ function CustomTable(props) {
     const title = "My Result";
     const headers = [["SUBJECT NAME", "GRADE"]];
 
-    //const data = subjectList.map(elem => [elem.subject_name, elem.class.class_name]); //todo show avg grade
-    const data = averageTestResultList.map(elem => [elem.name, elem.score]); //todo show avg grade
+    const data = averageTestResultList.map(elem => [elem.name, elem.score]);
 
     let content = {
       startY: 50,
