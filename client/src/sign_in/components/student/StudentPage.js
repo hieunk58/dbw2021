@@ -88,6 +88,7 @@ function CustomTable(props) {
   // test list is all test
   const [testResultBySubject, setTestResultBySubject] = useState([]);
   const [averageTestResultList, setAverageTestResultList] = useState([]);
+  // each element in averageTestResultList is an object {_id: , name: , score: }
   // extract test by subject id from test list
   // const [testListBySubject, setTestListBySubject] = useState([]);
   // const [subjectList, setSubjectListByTeacher] = useState([]);
@@ -186,7 +187,7 @@ function CustomTable(props) {
   
     // console.log(result);
     setAverageTestResultList(result);
-    
+
   }, [setAverageTestResultList]);
 
   const exportToPdf = () => {
@@ -202,7 +203,7 @@ function CustomTable(props) {
     const headers = [["SUBJECT NAME", "GRADE"]];
 
     //const data = subjectList.map(elem => [elem.subject_name, elem.class.class_name]); //todo show avg grade
-    const data = subjectList.map(elem => [elem.subject_name, 1]); //todo show avg grade
+    const data = averageTestResultList.map(elem => [elem.name, elem.score]); //todo show avg grade
 
     let content = {
       startY: 50,
