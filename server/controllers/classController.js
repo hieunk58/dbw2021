@@ -108,8 +108,10 @@ exports.class_delete_post = function(req, res) {
         if(results.subject_list.length > 0) {
             for(let i = 0; i < results.subject_list.length; ++i) {
                 // delete all test have subject id
+                console.log("delete subject list length: ", results.subject_list.length);
                 console.log("delete subject.id: ", results.subject_list[i]._id);
                 console.log("delete subject.name: ", results.subject_list[i].subject_name);
+
                 Test.deleteMany({'subject': results.subject_list[i]._id})
                 .exec(function(err) {
                     if(err) {
@@ -132,8 +134,22 @@ exports.class_delete_post = function(req, res) {
                         return;
                     }
                 });
+                
             }
         }
+
+        // delete all subjects
+        Subject.deleteMany({'class': id})
+        .exec(function(err) {
+            if(err) {
+                res.status(500).send({
+                    message:
+                    err.message || "Cannot delete class."
+                });
+                return;
+            }
+        });
+
         // 2. delete enrollment
         Enrollment.deleteMany({'class': id})
         .exec(function(err) {
