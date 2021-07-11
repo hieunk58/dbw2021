@@ -7,6 +7,7 @@ exports.result_list = function (req, res, next) {
     // var test_id = req.body.test_id;
     Result.find()
         .populate('test')
+        .populate('subject')
         .sort([['score', 'ascending']])
         .exec(function (err, list_results) {
             if (err) { 

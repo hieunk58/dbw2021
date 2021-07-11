@@ -77,7 +77,7 @@ const rowsPerPage = 25;
 
 function CustomTable(props) {
   // const location = useLocation();
-  const { classes, selectStudentPage, subjectList, testResultList } = props;
+  const { classes, selectStudentPage, subjectList, testResultList, currentUser } = props;
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
   const [page, setPage] = useState(0);
@@ -87,6 +87,7 @@ function CustomTable(props) {
   // const [currentSelectedSubject, setCurrentSelectedSubject] = useState(null);
   // test list is all test
   const [testResultBySubject, setTestResultBySubject] = useState([]);
+  const [averageTestResultList, setAverageTestResultList] = useState([]);
   // extract test by subject id from test list
   // const [testListBySubject, setTestListBySubject] = useState([]);
   // const [subjectList, setSubjectListByTeacher] = useState([]);
@@ -111,7 +112,7 @@ function CustomTable(props) {
     for(let i = 0; i < testResultList.length; ++i) {
       console.log("testResultList.subject: ", testResultList[i].subject);
       console.log("testResultList.test: ", testResultList[i].test.test_name);
-      if(testResultList[i].subject === subjectId) {
+      if(testResultList[i].subject._id === subjectId) {
         results.push(testResultList[i]);
       }
     }
@@ -120,6 +121,7 @@ function CustomTable(props) {
 
   const openTestResultDetail = ((row) => {
     // row is subject detail
+    console.log("openTestResultDetail: ", row);
     getTestResultBySubject(row._id);
     setOpen(true);
   });
@@ -148,6 +150,45 @@ function CustomTable(props) {
     [setPage]
   );
 
+  const calculateAvgResult = useCallback ((list, currentUser) => {
+    var testList = [];
+
+    for(let i = 0; i < list.length; ++i) {
+      if(list[i].student === currentUser.id) {
+        // take all test results belong to current student
+        var temp = {'_id': list[i].subject._id, 
+        'name': list[i].subject.subject_name, 
+        'score': list[i].score };
+        testList.push(temp);
+      }
+    }
+
+    // Calculate the sums and group data (while tracking count)
+    const reduced = testList.reduce(function(m, d){
+        if(!m[d.name]){
+          m[d.name] = {...d, count: 1};
+          return m;
+        }
+        m[d.name].score += d.score;
+        m[d.name].count += 1;
+        return m;
+    },{});
+   
+   // Create new array from grouped data and compute the average
+   const result = Object.keys(reduced).map(function(k){
+       const item  = reduced[k];
+       return {
+           _id: item._id,
+           name: item.name,
+           score: item.score/item.count
+       }
+   })
+  
+    // console.log(result);
+    setAverageTestResultList(result);
+    
+  }, [setAverageTestResultList]);
+
   const exportToPdf = () => {
     const unit = "pt";
     const size = "A4"; // Use A1, A2, A3 or A4
@@ -174,37 +215,10 @@ function CustomTable(props) {
     doc.save("result_report.pdf")
   }
 
-
-  // const fetchTestListBySubject = useCallback((currentSubject) => {
-  //   // get test list by subject id
-  //   console.log(" fetchTestListBySubject id: ", currentSubject);
-  //   DataService.getSubjectDetail(currentSubject._id)
-  //   .then((res) => {
-  //     console.log("test list by subject: ", res.data.list_test);
-  //     setTestListBySubject(res.data.list_test);
-  //   })
-  //   .catch((error) => {
-  //     console.log("error: ", error.response.data.message);
-  //     pushMessageToSnackbar({
-  //       text: error.response.data.message,
-  //     });
-  //   })
-  //   // return await response;
-  // }, [pushMessageToSnackbar]);
-
-  // const openManageTestPage = useCallback((row) => {
-  //   setCurrentSelectedSubject(row);
-  //   console.log("get test list by subject id: ", row._id);
-  //   // fetchTestListBySubject(row)
-  //   setIsManageTestPageOpen(true);
-  // }, []);
-
-  // const closeManageTestPage = useCallback(() => {
-  //   setIsManageTestPageOpen(false);
-  // }, [setIsManageTestPageOpen]);
   useEffect(() => {
     selectStudentPage();
-  }, [selectStudentPage]);
+    calculateAvgResult(testResultList, currentUser);
+  }, [calculateAvgResult, currentUser, selectStudentPage, testResultList]);
 
 
   return (
@@ -239,17 +253,17 @@ function CustomTable(props) {
       <Divider />
       <Box width="100%">
         <div className={classes.tableWrapper}>
-          {subjectList.length > 0 ? (
+          {averageTestResultList.length > 0 ? (
             <Table aria-labelledby="tableTitle">
               <EnhancedTableHead
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
-                rowCount={subjectList.length}
+                rowCount={averageTestResultList.length}
                 rows={rows}
               />
               <TableBody>
-                {stableSort(subjectList, getSorting(order, orderBy))
+                {stableSort(averageTestResultList, getSorting(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => (
                     <TableRow hover tabIndex={-1} key={index}>
@@ -263,10 +277,10 @@ function CustomTable(props) {
                         </IconButton>
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.subject_name}
+                        {row.name}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {1}
+                        {row.score}
                       </TableCell>
                       <TableCell component="th" scope="row">
                         <Box display="flex" justifyContent="flex-end">
@@ -302,7 +316,7 @@ function CustomTable(props) {
         <div className={classes.alignRight}>
           <TablePagination
             component="div"
-            count={subjectList.length}
+            count={averageTestResultList.length}
             rowsPerPage={rowsPerPage}
             page={page}
             backIconButtonProps={{
@@ -315,8 +329,8 @@ function CustomTable(props) {
             classes={{
               select: classes.dNone,
               selectIcon: classes.dNone,
-              actions: subjectList.length > 0 ? classes.dBlock : classes.dNone,
-              caption: subjectList.length > 0 ? classes.dBlock : classes.dNone,
+              actions: averageTestResultList.length > 0 ? classes.dBlock : classes.dNone,
+              caption: averageTestResultList.length > 0 ? classes.dBlock : classes.dNone,
             }}
             labelRowsPerPage=""
           />
