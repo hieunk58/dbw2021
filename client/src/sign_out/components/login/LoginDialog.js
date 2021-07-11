@@ -62,6 +62,19 @@
           history.push("/c/student");
         }
       })
+      .catch((err) => {
+        if(err.response.status === 404) {
+          // invalid username
+          setStatus("invalidUsername");
+        } else if(err.response.status === 401) {
+          // wrong password
+          setStatus("invalidPassword");
+        }
+        else {
+
+        }
+        
+      })
       setIsLoading(false);
 
       // .catch(error => {
